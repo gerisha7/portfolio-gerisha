@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerisha Vashisht — Brand & Growth</title>
+<meta name="description" content="Gerisha Vashisht — Marketing professional in digital marketing, content strategy and brand positioning.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14203B;
+    --paper:#FAF6EF;
+    --paper-dim:#F1EADB;
+    --rose:#C81E4B;
+    --mustard:#E8A63B;
+    --sage:#4F6F52;
+    --line: rgba(20,32,59,0.14);
+    --maxw: 1180px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 32px;}
+  h1,h2,h3{font-family:'Big Shoulders Display',sans-serif; text-transform:uppercase; margin:0; letter-spacing:0.01em;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--rose); font-weight:600;
+  }
+
+  /* ===== NAV ===== */
+  header.site{
+    position:sticky; top:0; z-index:50;
+    background:rgba(250,246,239,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .navbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 32px; max-width:var(--maxw); margin:0 auto;
+  }
+  .brandmark{
+    font-family:'Big Shoulders Display',sans-serif;
+    font-weight:800; font-size:22px; letter-spacing:0.02em;
+    display:flex; align-items:center; gap:8px;
+    text-decoration:none; color:var(--ink);
+  }
+  .brandmark .dot{width:9px;height:9px;border-radius:50%;background:var(--rose); display:inline-block;}
+  nav.links{display:flex; gap:28px;}
+  nav.links a{
+    text-decoration:none; font-size:13px; font-weight:600; letter-spacing:0.05em;
+    text-transform:uppercase; color:var(--ink); opacity:0.7;
+    position:relative; padding-bottom:3px;
+  }
+  nav.links a:hover{opacity:1;}
+  nav.links a::after{
+    content:''; position:absolute; left:0; bottom:0; height:2px; width:0%;
+    background:var(--rose); transition:width 0.25s ease;
+  }
+  nav.links a:hover::after{width:100%;}
+  .navcta{
+    font-size:12px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+    background:var(--ink); color:var(--paper); padding:9px 16px; border-radius:2px;
+    text-decoration:none;
+  }
+  .nav-cta-group{display:flex; align-items:center; gap:10px;}
+  .navcta-outline{background:transparent; border:1.5px solid var(--ink); color:var(--ink);}
+  .navcta-outline:hover{background:var(--ink); color:var(--paper);}
+  .menu-btn{display:none; background:none; border:none; cursor:pointer; padding:6px;}
+  .menu-btn span{display:block; width:22px; height:2px; background:var(--ink); margin:5px 0;}
+
+  /* ===== HERO ===== */
+  .hero{
+    padding:88px 0 0;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero .wrap{position:relative; z-index:2;}
+  .masthead-row{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; opacity:0.6;
+  }
+  .hero h1{
+    font-size:clamp(52px, 10vw, 128px);
+    line-height:0.92;
+    font-weight:900;
+    margin:18px 0 0;
+    opacity:0;
+    animation:riseIn 0.8s cubic-bezier(.2,.7,.3,1) 0.1s forwards;
+  }
+  .hero h1 .accent{color:var(--rose);}
+  @keyframes riseIn{
+    from{opacity:0; transform:translateY(24px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .hero-top-row{display:flex; align-items:flex-end; justify-content:space-between; gap:32px;}
+  .hero-photo{flex-shrink:0; padding-bottom:6px;}
+  .hero-photo-frame{
+    width:148px; height:148px; border-radius:50%; padding:5px;
+    background:linear-gradient(135deg, var(--rose), var(--mustard));
+  }
+  .hero-photo-placeholder{
+    width:100%; height:100%; border-radius:50%;
+    background:var(--paper-dim); border:1px dashed rgba(20,32,59,0.3);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Big Shoulders Display',sans-serif; font-size:32px; font-weight:800;
+    color:rgba(20,32,59,0.35);
+  }
+  @media (max-width:860px){
+    .hero-top-row{flex-direction:column-reverse; align-items:flex-start;}
+  }
+  .hero-sub{
+    display:flex; gap:48px; flex-wrap:wrap;
+    margin-top:26px; padding-top:26px; border-top:1px solid var(--line);
+    padding-bottom:52px;
+    opacity:0; animation:riseIn 0.8s cubic-bezier(.2,.7,.3,1) 0.35s forwards;
+  }
+  .hero-tagline{max-width:480px; font-size:18px; line-height:1.5;}
+  .hero-meta{display:flex; flex-direction:column; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:13px;}
+  .hero-meta span{opacity:0.55;}
+  .hero-meta strong{font-weight:600;}
+  .hero-btns{display:flex; gap:14px; margin-top:22px;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:12px 20px; text-decoration:none; font-size:13px; font-weight:700;
+    letter-spacing:0.05em; text-transform:uppercase; border-radius:2px;
+    transition:transform 0.25s cubic-bezier(.22,.61,.36,1), box-shadow 0.25s cubic-bezier(.22,.61,.36,1);
+  }
+  .btn-primary{background:var(--rose); color:#fff;}
+  .btn-outline{border:1.5px solid var(--ink); color:var(--ink);}
+  .btn:hover{transform:translateY(-2px); box-shadow:0 12px 24px -10px rgba(20,32,59,0.35);}
+
+  /* ===== TICKER (signature element) ===== */
+  .ticker{
+    background:var(--ink); color:var(--paper);
+    overflow:hidden; white-space:nowrap; position:relative;
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  }
+  .ticker::before, .ticker::after{
+    content:''; position:absolute; top:0; bottom:0; width:60px; z-index:2; pointer-events:none;
+  }
+  .ticker::before{left:0; background:linear-gradient(90deg, var(--ink), transparent);}
+  .ticker::after{right:0; background:linear-gradient(270deg, var(--ink), transparent);}
+  .ticker-track{
+    display:inline-flex; align-items:center;
+    animation:scrollTicker 34s linear infinite;
+    padding:13px 0;
+  }
+  .ticker:hover .ticker-track{animation-play-state:paused;}
+  .ticker-track span{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:0.05em;
+    padding:0 28px; text-transform:uppercase;
+  }
+  .ticker-track span.hl{color:var(--mustard); font-weight:600;}
+  .ticker-track span::before{content:'●'; color:var(--rose); margin-right:24px; font-size:8px; vertical-align:middle;}
+  @keyframes scrollTicker{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+  }
+
+  /* ===== SECTION shared ===== */
+  section{padding:128px 0;}
+  .section-head{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:48px; border-bottom:1px solid var(--line); padding-bottom:18px;}
+  .section-head h2{font-size:clamp(34px,5vw,54px);}
+  .index-no{font-family:'IBM Plex Mono',monospace; font-size:13px; opacity:0.45;}
+
+  /* ===== ABOUT ===== */
+  .about-grid{display:grid; grid-template-columns:1.3fr 0.7fr; gap:56px;}
+  .about-lead{font-size:22px; line-height:1.6; font-weight:400;}
+  .about-lead strong{font-weight:600; color:var(--rose);}
+  .fact-list{display:flex; flex-direction:column; gap:0;}
+  .fact-list div{
+    display:flex; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--line);
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+  }
+  .fact-list div span:first-child{opacity:0.5; text-transform:uppercase; letter-spacing:0.06em;}
+  .fact-list div span:last-child{font-weight:600; text-align:right;}
+
+  /* ===== EXPERIENCE (press clipping cards) ===== */
+  .exp-card{
+    border-top:1px solid var(--line); padding:44px 0;
+    display:grid; grid-template-columns:200px 1fr; gap:32px;
+    transition:padding-left 0.3s ease;
+  }
+  .exp-card:hover{padding-left:8px;}
+  .exp-card:last-child{border-bottom:1px solid var(--line);}
+  .exp-date{font-family:'IBM Plex Mono',monospace; font-size:13px; opacity:0.6; padding-top:4px;}
+  .exp-role{font-size:26px; font-weight:700; margin-bottom:4px; text-transform:none; font-family:'Big Shoulders Display',sans-serif; letter-spacing:0.01em;}
+  .exp-org{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--rose); margin-bottom:16px; text-transform:uppercase; letter-spacing:0.04em;}
+  .exp-list{margin:0; padding-left:20px; line-height:1.7; font-size:15.5px;}
+  .exp-list li{margin-bottom:6px;}
+  .exp-list li::marker{color:var(--mustard);}
+
+  /* ===== PROJECTS (case cards) ===== */
+  .case-grid{display:grid; grid-template-columns:1fr 1fr; gap:28px;}
+  .case-card{
+    background:var(--paper-dim); border:1px solid var(--line); border-radius:4px;
+    padding:40px; position:relative; overflow:hidden;
+    transition:transform 0.3s cubic-bezier(.22,.61,.36,1), box-shadow 0.3s cubic-bezier(.22,.61,.36,1);
+  }
+  .case-card:hover{transform:translateY(-6px); box-shadow:0 22px 44px -20px rgba(20,32,59,0.35);}
+  .case-card .tag{
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.08em;
+    text-transform:uppercase; background:var(--ink); color:var(--paper); padding:4px 10px; border-radius:2px; margin-bottom:18px;
+  }
+  .case-card h3{font-size:26px; margin-bottom:12px; font-weight:700;}
+  .case-card p{font-size:15px; line-height:1.65; margin:0; opacity:0.85;}
+  .case-card .num{
+    position:absolute; right:18px; top:10px; font-family:'Big Shoulders Display',sans-serif;
+    font-size:90px; font-weight:900; color:rgba(20,32,59,0.06); line-height:1;
+  }
+
+  /* ===== SKILLS ===== */
+  .skills-wrap{display:flex; flex-wrap:wrap; gap:12px; margin-bottom:56px;}
+  .chip{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:0.03em;
+    padding:10px 18px; border:1.5px solid var(--ink); border-radius:100px;
+    text-transform:uppercase; cursor:default; transition:background 0.2s ease, color 0.2s ease;
+  }
+  .chip:hover{background:var(--ink); color:var(--paper);}
+  .cert-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  .cert-card{border-left:3px solid var(--rose); padding:6px 0 6px 18px; transition:transform 0.25s ease, padding-left 0.25s ease;}
+  .cert-card:hover{transform:translateX(2px); padding-left:22px;}
+  .cert-card .cert-org{font-weight:700; font-size:16px;}
+  .cert-card .cert-meta{font-family:'IBM Plex Mono',monospace; font-size:12px; opacity:0.6; margin-top:4px;}
+  .cert-card .cert-desc{font-size:14px; line-height:1.55; opacity:0.8; margin:10px 0 0;}
+
+  /* ===== SIDE LISTS ===== */
+  .beyond-intro{
+    font-size:18px; line-height:1.65; max-width:680px; margin:0 0 48px;
+    padding-left:22px; border-left:3px solid var(--mustard); opacity:0.85;
+  }
+  .three-col{display:grid; grid-template-columns:repeat(3,1fr); gap:40px;}
+  .col-block h3{font-size:20px; margin-bottom:16px; padding-bottom:10px; border-bottom:2px solid var(--ink);}
+  .col-block ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px;}
+  .col-block li{font-size:14.5px; line-height:1.55; padding-left:16px; position:relative;}
+  .col-block li::before{content:'—'; position:absolute; left:0; color:var(--mustard);}
+
+  /* ===== CONTACT / FOOTER ===== */
+  footer{background:var(--ink); color:var(--paper); padding:90px 0 40px;}
+  .contact-head{font-size:clamp(38px,7vw,72px); line-height:1; margin-bottom:24px;}
+  .contact-row{display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:32px; border-bottom:1px solid rgba(250,246,239,0.18); padding-bottom:52px; margin-bottom:32px;}
+  footer .btn-primary{background:var(--rose);}
+  .contact-links{display:flex; flex-direction:column; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:14px;}
+  .contact-links a{text-decoration:none; opacity:0.85; border-bottom:1px solid rgba(250,246,239,0.3); padding-bottom:2px; width:fit-content;}
+  .contact-links a:hover{opacity:1; border-color:var(--paper);}
+  .foot-bottom{display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:11px; opacity:0.5; letter-spacing:0.04em; flex-wrap:wrap; gap:10px;}
+  .edit-note{
+    margin-top:6px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--mustard); opacity:0.9;
+  }
+
+  /* reveal-on-scroll: visible by default, only hidden once JS confirms it can animate it back in */
+  .reveal{opacity:1; transform:none;}
+  html.js-ready .reveal{opacity:0; transform:translateY(20px); transition:opacity 0.7s ease, transform 0.7s ease;}
+  html.js-ready .reveal.in{opacity:1; transform:translateY(0);}
+
+  a:focus-visible, button:focus-visible{outline:2px solid var(--rose); outline-offset:3px;}
+
+  @media (max-width:860px){
+    .about-grid, .exp-card, .case-grid, .three-col, .cert-grid{grid-template-columns:1fr;}
+    nav.links{display:none;}
+    .menu-btn{display:block;}
+    .nav-cta-group{display:none;}
+    section{padding:64px 0;}
+    .wrap{padding:0 20px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="navbar">
+    <a href="#top" class="brandmark"><span class="dot"></span>GV<span style="opacity:0.4;font-weight:500;">/ vashisht</span></a>
+    <nav class="links">
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#work">Work</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="nav-cta-group">
+      <a class="navcta navcta-outline" href="assets/resume/Gerisha_Vashisht_Resume.pdf" download>Resume</a>
+      <a class="navcta" href="#contact">Get in touch</a>
+    </div>
+    <button class="menu-btn" aria-label="Menu" onclick="document.querySelector('nav.links').classList.toggle('mobile-open')">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="masthead-row">
+      <span>Vol. 01 — Brand &amp; Growth Dispatch</span>
+      <span id="live-clock">Gurgaon, India</span>
+    </div>
+    <div class="hero-top-row">
+      <h1>GERISHA<br><span class="accent">VASHISHT.</span></h1>
+      <div class="hero-photo reveal">
+        <div class="hero-photo-frame">
+          <div class="hero-photo-placeholder">GV</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-sub">
+      <p class="hero-tagline">
+        Marketing professional working across <strong>digital marketing</strong>, <strong>content strategy</strong> and <strong>brand positioning</strong> —
+        turning research and media insight into campaigns that move numbers, not just moods.
+      </p>
+      <div class="hero-meta">
+        <span>Currently: <strong>MBA, Great Lakes Institute of Management, Gurgaon</strong></span>
+        <span>Focus: <strong>Digital Marketing · Content · Brand Strategy</strong></span>
+        <span>Open to: <strong>Marketing &amp; Brand roles, 2026–27</strong></span>
+        <div class="hero-btns">
+          <a href="#work" class="btn btn-primary">View the work ↓</a>
+          <a href="#contact" class="btn btn-outline">Say hello</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span class="hl">15% growth</span><span>in pre‑registrations driven</span><span class="hl">500+ member</span><span>community built &amp; managed</span><span class="hl">25% lift</span><span>in engagement</span><span>10+ influencer collaborations led</span><span class="hl">8‑week</span><span>LVMH brand programme</span><span class="hl">10‑week</span><span>McKinsey Forward programme</span><span>Healthcare media trackers built at FINN Partners</span>
+      <span class="hl">15% growth</span><span>in pre‑registrations driven</span><span class="hl">500+ member</span><span>community built &amp; managed</span><span class="hl">25% lift</span><span>in engagement</span><span>10+ influencer collaborations led</span><span class="hl">8‑week</span><span>LVMH brand programme</span><span class="hl">10‑week</span><span>McKinsey Forward programme</span><span>Healthcare media trackers built at FINN Partners</span>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>About</h2>
+      <span class="index-no">01 / Profile</span>
+    </div>
+    <div class="about-grid">
+      <p class="about-lead reveal">
+        I'm a marketing professional who likes campaigns that can be measured, not just admired.
+        My work sits at the intersection of <strong>research</strong>, <strong>content</strong> and <strong>brand</strong> —
+        from translating clinical research into publication‑ready healthcare content, to building a
+        500‑member community from scratch. I care about the story a brand tells and the number that
+        proves it worked.
+      </p>
+      <div class="fact-list reveal">
+        <div><span>Education</span><span>MBA, Great Lakes Institute of Management</span></div>
+        <div><span>Location</span><span>Gurgaon, India</span></div>
+        <div><span>Languages</span><span>English, Hindi</span></div>
+        <div><span>Committee</span><span>Alumni Committee, 2026</span></div>
+        <div><span>Status</span><span>Open to opportunities</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="experience" style="background:var(--paper-dim);">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Experience</h2>
+      <span class="index-no">02 / On the record</span>
+    </div>
+
+    <div class="exp-card reveal">
+      <div class="exp-date mono">APR 2026 – MAY 2026</div>
+      <div>
+        <div class="exp-role">PR Intern</div>
+        <div class="exp-org">SPAG · FINN Partners</div>
+        <ul class="exp-list">
+          <li>Developed media trackers for healthcare accounts, monitoring print &amp; digital mentions to support campaign reporting.</li>
+          <li>Drafted healthcare articles, translating clinical research into publication‑ready content for accurate owned‑media output.</li>
+          <li>Managed outreach for media initiatives — journalist pitches, follow‑ups and response monitoring — to streamline execution.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exp-card reveal">
+      <div class="exp-date mono">JUN 2023 – JAN 2024</div>
+      <div>
+        <div class="exp-role">Marketing Intern</div>
+        <div class="exp-org">Gape Labs</div>
+        <ul class="exp-list">
+          <li>Researched digital trends &amp; audience behaviour to sharpen targeted campaigns — a 15% growth in pre‑registrations.</li>
+          <li>Built and managed a 500+ member Discord community, lifting engagement by 25%.</li>
+          <li>Led 10+ influencer collaborations, expanding organic reach and pre‑launch positioning.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Selected Work</h2>
+      <span class="index-no">03 / Case files</span>
+    </div>
+    <div class="case-grid">
+      <div class="case-card reveal">
+        <div class="num">01</div>
+        <span class="tag">Strategy · E‑commerce</span>
+        <h3>Digital Marketing Strategy</h3>
+        <p>
+          Built an e‑commerce website from the ground up, backed by a Business Lean Canvas and a
+          Jobs‑to‑be‑Done framework to pin down customer needs and value proposition. Applied on‑page
+          SEO and digital marketing principles to sharpen search visibility and user experience.
+        </p>
+      </div>
+      <div class="case-card reveal">
+        <div class="num">02</div>
+        <span class="tag">Research · Positioning</span>
+        <h3>Brand Positioning Project</h3>
+        <p>
+          Ran primary and secondary market research with competitor benchmarking and STP analysis to
+          define target audiences. Shaped a brand positioning and content‑led communication strategy,
+          mapped end‑to‑end against the customer journey.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills" style="background:var(--paper-dim);">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Skills &amp; Credentials</h2>
+      <span class="index-no">04 / Toolkit</span>
+    </div>
+    <div class="skills-wrap reveal">
+      <span class="chip">Communication</span>
+      <span class="chip">Market Research</span>
+      <span class="chip">Competitor Analysis</span>
+      <span class="chip">Data Visualisation</span>
+      <span class="chip">Performance Marketing</span>
+    </div>
+    <div class="cert-grid reveal">
+      <div class="cert-card">
+        <div class="cert-org">Creation, Branding, Retail &amp; Customer Experience</div>
+        <div class="cert-meta">LVMH — 2026 · 8 weeks</div>
+        <p class="cert-desc">Luxury brand-building, retail experience design, and customer journey strategy.</p>
+      </div>
+      <div class="cert-card">
+        <div class="cert-org">The McKinsey Forward Program</div>
+        <div class="cert-meta">McKinsey &amp; Company — 2025 · 10 weeks</div>
+        <p class="cert-desc">Structured problem-solving, leadership, communication, and business thinking.</p>
+      </div>
+      <div class="cert-card">
+        <div class="cert-org">Fundamentals of Digital Marketing</div>
+        <div class="cert-meta">Google Digital Garage — 2023 · 6 weeks</div>
+        <p class="cert-desc">SEO, digital strategy, analytics, and customer acquisition fundamentals.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="more">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Beyond the Brief</h2>
+      <span class="index-no">05 / Also on record</span>
+    </div>
+    <p class="beyond-intro reveal">
+      Marketing goes beyond campaigns and metrics. It's about understanding people, discovering
+      meaningful insights, and creating experiences that leave a lasting impact. Every project here
+      reflects a balance of strategy, creativity, and analytical thinking.
+    </p>
+    <div class="three-col">
+      <div class="col-block reveal">
+        <h3>Awards</h3>
+        <ul>
+          <li>Letter of Recommendation — SN Retail Advisory, 2025</li>
+          <li>Letter of Recommendation — House Uncle, 2023</li>
+        </ul>
+      </div>
+      <div class="col-block reveal">
+        <h3>Positions of Responsibility</h3>
+        <ul>
+          <li>Member, Alumni Committee — Great Lakes Institute of Management, Gurgaon, 2026</li>
+        </ul>
+      </div>
+      <div class="col-block reveal">
+        <h3>Extra‑Curricular</h3>
+        <ul>
+          <li>Managed registrations &amp; participant outreach for Reminiscence, 2026</li>
+          <li>Volunteered with NSS for education &amp; community service, 2023</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="contact-row">
+      <div>
+        <div class="eyebrow" style="color:var(--mustard);">Let's talk</div>
+        <h2 class="contact-head">Got a brand<br>worth building?</h2>
+        <div class="hero-btns">
+          <a href="mailto:gerisha.pgdm27g@greatlakes.edu.in" class="btn btn-primary">Email me →</a>
+          <a href="assets/resume/Gerisha_Vashisht_Resume.pdf" download class="btn btn-outline" style="border-color:var(--paper); color:var(--paper);">Download Resume</a>
+        </div>
+      </div>
+      <div class="contact-links">
+        <a href="mailto:gerisha.pgdm27g@greatlakes.edu.in">gerisha.pgdm27g@greatlakes.edu.in</a>
+        <a href="https://www.linkedin.com/in/gerishavashisht/" target="_blank" rel="noopener">linkedin.com/in/gerishavashisht</a>
+        <a href="tel:+917876723591">+91 78767 23591</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span id="year"></span> Gerisha Vashisht</span>
+      <span>Great Lakes Institute of Management, Gurgaon</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // scroll reveal — only enabled once we know JS is running, so nothing ever gets stuck invisible
+  document.documentElement.classList.add('js-ready');
+  const revealEls = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, {threshold:0.1});
+    revealEls.forEach(el=>io.observe(el));
+  } else {
+    revealEls.forEach(el=>el.classList.add('in'));
+  }
+
+  // live local time in hero masthead
+  function updateClock(){
+    const el = document.getElementById('live-clock');
+    const now = new Date();
+    const time = now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+    el.textContent = 'Gurgaon, India — ' + time + ' IST';
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
+</script>
+
+</body>
+</html>
