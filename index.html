@@ -109,11 +109,27 @@
     to{opacity:1; transform:translateY(0);}
   }
   .hero-top-row{display:flex; align-items:flex-end; justify-content:space-between; gap:32px;}
-  .hero-photo{flex-shrink:0; padding-bottom:6px;}
-  .hero-photo-frame{
-    width:148px; height:148px; border-radius:50%; padding:5px;
-    background:linear-gradient(135deg, var(--rose), var(--mustard));
-  }
+  .hero-photo{
+    flex-shrink:0;
+    padding-bottom:6px;
+}
+
+.hero-photo-img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:50%;
+    display:block;
+}
+
+.hero-photo-frame{
+    width:148px;
+    height:148px;
+    border-radius:50%;
+    padding:5px;
+    overflow:hidden;
+    background:linear-gradient(135deg,var(--rose),var(--mustard));
+}
   .hero-photo-placeholder{
     width:100%; height:100%; border-radius:50%;
     background:var(--paper-dim); border:1px dashed rgba(20,32,59,0.3);
@@ -313,8 +329,8 @@
       <h1>GERISHA<br><span class="accent">VASHISHT.</span></h1>
       <div class="hero-photo reveal">
         <div class="hero-photo-frame">
-          <img src="assets/GV.jpeg" alt="Gerisha Vashisht" class="hero-photo">
-        </div>
+    <img src="assets/GV.jpeg" alt="Gerisha Vashisht" class="hero-photo-img">
+      </div>
       </div>
     </div>
     <div class="hero-sub">
