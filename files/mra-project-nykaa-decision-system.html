@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nykaa — Marketing & Retail Decision System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF6F3;
+    --panel:#FFFFFF;
+    --ink:#241017;
+    --ink-soft:#6b5560;
+    --wine:#7A1F3D;
+    --wine-deep:#4E1327;
+    --gold:#B08D57;
+    --line:#E7DCD8;
+    --good:#4C7A5E;
+    --warn:#C77D2E;
+    --bad:#B23A3A;
+    --accent:#8B5E9E;
+    --radius:10px;
+    --shadow:0 1px 3px rgba(0,0,0,.04);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;line-height:1.5;}
+  h1,h2,h3{font-family:'Fraunces',serif;}
+
+  .app{display:flex;min-height:100vh;}
+
+  /* SIDEBAR */
+  .sidebar{
+    width:250px;
+    background:var(--wine-deep);
+    color:#F3E7EC;
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    padding:28px 0;
+    position:fixed;
+    top:0;
+    left:0;
+    bottom:0;
+    overflow-y:auto;
+    z-index:10;
+  }
+  .brand{padding:0 20px 22px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:6px;}
+  .brand .eyebrow{font-size:9px;letter-spacing:.14em;text-transform:uppercase;opacity:.55;font-weight:500;}
+  .brand h1{font-size:21px;font-weight:600;margin-top:4px;color:#fff;letter-spacing:-0.3px;}
+  .brand .sub{font-size:11px;opacity:.5;margin-top:3px;}
+  .nav-group{margin-top:14px;}
+  .nav-label{font-size:9px;letter-spacing:.12em;text-transform:uppercase;opacity:.4;padding:0 20px;margin-bottom:5px;font-weight:600;}
+  .nav-btn{
+    display:block;width:100%;text-align:left;background:none;border:none;
+    color:#F3E7EC;padding:7px 20px;font-size:12.5px;font-family:inherit;cursor:pointer;
+    opacity:.7;border-left:3px solid transparent;transition:all .15s;line-height:1.6;
+  }
+  .nav-btn:hover{opacity:1;background:rgba(255,255,255,.05);}
+  .nav-btn.active{opacity:1;border-left-color:var(--gold);background:rgba(255,255,255,.07);font-weight:500;}
+  .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.1);font-size:10px;opacity:.4;margin-top:auto;}
+
+  /* MAIN */
+  .main{
+    flex:1;
+    padding:32px 40px;
+    max-width:1240px;
+    margin-left:250px;
+    width:calc(100% - 250px);
+    min-height:100vh;
+  }
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  .screen-head{margin-bottom:20px;}
+  .screen-head .tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--wine);font-weight:600;}
+  .screen-head h2{font-size:25px;margin-top:4px;}
+  .screen-head p{color:var(--ink-soft);margin-top:4px;max-width:720px;line-height:1.6;}
+  .screen-head .meta-row{display:flex;gap:18px;margin-top:8px;font-size:11px;color:var(--ink-soft);flex-wrap:wrap;}
+  .screen-head .meta-row span{background:#fff;padding:3px 10px;border-radius:20px;border:1px solid var(--line);}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin-bottom:16px;box-shadow:var(--shadow);}
+  .card h3{font-size:15px;margin-bottom:12px;font-weight:600;}
+  .card h4{font-size:13px;margin:14px 0 8px;color:var(--ink-soft);font-weight:600;}
+
+  .card-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .card-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .two-col-uneven{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;}
+  .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+  /* KPIs */
+  .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px 16px;box-shadow:var(--shadow);}
+  .kpi .label{font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;font-weight:500;}
+  .kpi .value{font-family:'Fraunces',serif;font-size:26px;margin:4px 0 5px;letter-spacing:-0.5px;}
+  .kpi .delta{font-size:11px;font-weight:500;line-height:1.4;}
+  .delta.up{color:var(--good);} .delta.down{color:var(--bad);} .delta.warn{color:var(--warn);}
+  .kpi.warn-card{border-left:3px solid var(--warn);}
+  .kpi.good-card{border-left:3px solid var(--good);}
+  .kpi.bad-card{border-left:3px solid var(--bad);}
+
+  /* TABLES */
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{text-align:left;font-weight:600;color:var(--ink-soft);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap;}
+  td{padding:8px 10px;border-bottom:1px solid #F3EEEA;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .mono{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--wine);}
+  .mono-sm{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-soft);}
+
+  /* PILLS */
+  .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:500;white-space:nowrap;}
+  .pill.fast{background:#EFE0E6;color:var(--wine);}
+  .pill.slow{background:#EFE6D8;color:#8B6914;}
+  .pill.mix{background:#E8E4E6;color:var(--ink-soft);}
+  .pill.good{background:#E1EDE5;color:var(--good);}
+  .pill.warn{background:#FDF0E0;color:var(--warn);}
+  .pill.bad{background:#FBE8E8;color:var(--bad);}
+  .pill.info{background:#EDE4F2;color:var(--accent);}
+  .flag{color:var(--bad);font-weight:600;}
+  .flag-cell{border-left:2px solid var(--bad);}
+
+  /* BAR CHART */
+  .bar-chart{display:flex;align-items:flex-end;gap:6px;height:120px;margin:8px 0;}
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:44px;}
+  .bar-fill{border-radius:4px 4px 0 0;width:100%;max-width:54px;transition:height .3s;}
+  .bar-fill.good-bar{background:var(--good);}
+  .bar-fill.warn-bar{background:var(--warn);}
+  .bar-fill.bad-bar{background:var(--bad);}
+  .bar-fill.wine-bar{background:var(--wine);opacity:.7;}
+  .bar-fill.gold-bar{background:var(--gold);opacity:.7;}
+  .bar-label{font-size:9px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;}
+
+  /* FORMS */
+  .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .form-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .field label{display:block;font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;font-weight:500;}
+  .field select,.field input,.field textarea{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:12.5px;background:#FAFAF8;}
+  .field textarea{min-height:60px;resize:vertical;}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--wine);box-shadow:0 0 0 2px rgba(122,31,61,.08);}
+  .btn{background:var(--wine);color:#fff;border:none;padding:9px 18px;border-radius:6px;font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;}
+  .btn:hover{background:var(--wine-deep);}
+  .btn.ghost{background:none;border:1px solid var(--line);color:var(--ink);}
+  .btn.ghost:hover{background:#f5f2f0;}
+  .btn.small{padding:6px 12px;font-size:11px;}
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+
+  /* FILTERS */
+  .filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+  .filter-bar select{padding:6px 9px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:12px;background:#fff;}
+  .filter-bar .filter-label{font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;font-weight:600;}
+
+  /* TREE */
+  .tree{font-size:12.5px;line-height:2;}
+  .tree .l1{font-weight:600;}
+  .tree .l2{padding-left:22px;color:var(--ink-soft);}
+
+  /* NOTES */
+  .note{font-size:11.5px;color:var(--ink-soft);background:#F6F0EB;border-left:3px solid var(--gold);padding:10px 14px;border-radius:0 6px 6px 0;margin-top:10px;line-height:1.6;}
+  .alert{font-size:11.5px;background:#FFF8F0;border-left:3px solid var(--warn);padding:10px 14px;border-radius:0 6px 6px 0;margin-top:10px;line-height:1.6;}
+  .good-note{font-size:11.5px;background:#F0F7F2;border-left:3px solid var(--good);padding:10px 14px;border-radius:0 6px 6px 0;margin-top:10px;line-height:1.6;}
+  .info-note{font-size:11.5px;background:#F5EEF8;border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 6px 6px 0;margin-top:10px;line-height:1.6;}
+
+  /* TABS */
+  .tabs{display:flex;gap:0;margin-bottom:14px;border-bottom:2px solid var(--line);}
+  .tab-btn{padding:8px 16px;background:none;border:none;font-family:inherit;font-size:12.5px;cursor:pointer;color:var(--ink-soft);border-bottom:2px solid transparent;margin-bottom:-2px;}
+  .tab-btn.active{color:var(--wine);border-bottom-color:var(--wine);font-weight:500;}
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+
+  .info-icon{display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--line);text-align:center;line-height:16px;font-size:10px;cursor:help;margin-left:4px;color:var(--ink-soft);}
+
+  .footer-note{font-size:11px;color:var(--ink-soft);margin-top:28px;border-top:1px solid var(--line);padding-top:14px;line-height:1.7;}
+
+  /* Flow diagram */
+  .flow-box{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;padding:16px 0;}
+  .flow-step{background:var(--panel);border:2px solid var(--line);border-radius:var(--radius);padding:12px 16px;text-align:center;font-size:11px;font-weight:500;min-width:90px;}
+  .flow-step.highlight{border-color:var(--wine);background:#FDF6F8;}
+  .flow-arrow{font-size:18px;color:var(--gold);font-weight:600;}
+
+  /* ER Diagram */
+  .er-block{background:#FAF8F6;border:1px solid var(--line);border-radius:8px;padding:12px 16px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.6;}
+  .er-block pk{color:var(--wine);font-weight:600;}
+  .er-block fk{color:var(--gold);}
+  .er-line{width:30px;height:1px;background:var(--ink-soft);margin:0 8px;}
+
+  /* Heat map */
+  .heat-cell{display:inline-block;width:28px;height:28px;border-radius:4px;margin:2px;}
+  .heat-hi{background:#7A1F3D;}
+  .heat-mid{background:#B08D57;}
+  .heat-lo{background:#E7DCD8;}
+  .heat-na{background:#F5F2F0;}
+
+  .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;}
+  .status-dot.green{background:var(--good);}
+  .status-dot.amber{background:var(--warn);}
+  .status-dot.red{background:var(--bad);}
+
+  @media(max-width:900px){
+    .app{flex-direction:column;}
+    .sidebar{
+      position:relative;width:100%;flex-direction:row;overflow-x:auto;
+      padding:12px 8px;z-index:1;bottom:auto;
+    }
+    .brand{display:none;}
+    .nav-group{display:flex;gap:4px;margin:0;flex-wrap:wrap;}
+    .nav-btn{font-size:10px;padding:6px 10px;border-left:none;border-bottom:3px solid transparent;white-space:nowrap;}
+    .nav-btn.active{border-left:none;border-bottom-color:var(--gold);}
+    .main{margin-left:0;width:100%;padding:16px;}
+    .kpi-row{grid-template-columns:repeat(2,1fr);}
+    .card-row,.two-col,.two-col-uneven,.three-col{grid-template-columns:1fr;}
+    .form-grid,.form-grid-4{grid-template-columns:1fr;}
+    .flow-box{flex-direction:column;}
+    .flow-arrow{transform:rotate(90deg);}
+  }
+
+  @media(max-width:600px){
+    .kpi-row{grid-template-columns:1fr;}
+    .screen-head h2{font-size:20px;}
+    .kpi .value{font-size:22px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="eyebrow">MRA Group Project · Q2 FY26</div>
+      <h1>Nykaa</h1>
+      <div class="sub">Decision System v3.0</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">📊 Decision Dashboards</div>
+      <button class="nav-btn active" data-screen="leadership">01 · Leadership Dashboard</button>
+      <button class="nav-btn" data-screen="marketing">02 · Marketing Dashboard</button>
+      <button class="nav-btn" data-screen="category">03 · Category Dashboard</button>
+      <button class="nav-btn" data-screen="store">04 · Store Dashboard</button>
+      <button class="nav-btn" data-screen="diagnostic">05 · Diagnostic Dashboard</button>
+      <button class="nav-btn" data-screen="scenario">06 · Scenario Planner</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">🏗️ System Design</div>
+      <button class="nav-btn" data-screen="business">07 · Business & Decisions</button>
+      <button class="nav-btn" data-screen="taxonomy">08 · Investment & Return Trees</button>
+      <button class="nav-btn" data-screen="dimensions">09 · Shared Dimensions</button>
+      <button class="nav-btn" data-screen="kpi-arch">10 · KPI Architecture</button>
+      <button class="nav-btn" data-screen="entry-inv">11 · Investment Input</button>
+      <button class="nav-btn" data-screen="entry-ret">12 · Return Input</button>
+      <button class="nav-btn" data-screen="tables">13 · Tables & ER Diagram</button>
+      <button class="nav-btn" data-screen="sys-arch">14 · System Architecture</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">📋 Project Docs</div>
+      <button class="nav-btn" data-screen="sample-data">15 · Sample Data</button>
+      <button class="nav-btn" data-screen="assumptions">16 · Assumptions</button>
+      <button class="nav-btn" data-screen="limitations">17 · Limitations</button>
+      <button class="nav-btn" data-screen="summary">18 · Project Summary</button>
+      <button class="nav-btn" data-screen="recommendations">19 · Recommendations</button>
+    </div>
+    <div class="sidebar-footer">Data refresh: Today 08:30 IST<br>Source: Synthetic / Illustrative<br>v3.0 · All 26 screens complete</div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- LEADERSHIP DASHBOARD -->
+    <div class="screen active" id="leadership">
+      <div class="screen-head">
+        <div class="tag">Dashboard · Who: CEO, CFO, CMO</div>
+        <h2>01 · Leadership Dashboard — Q2 FY26</h2>
+        <p><strong>Why this page exists:</strong> Leadership needs one source of truth for "Is the business winning?" Every KPI answers the question: <strong>where should the next incremental rupee go?</strong></p>
+        <div class="meta-row">
+          <span>Period: Jul–Sep 2026</span>
+          <span>SBUs: Marketplace · Owned Brands · Offline Retail</span>
+          <span>Target Owner: CFO Office</span>
+        </div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi good-card"><div class="label">GMV (This Quarter)</div><div class="value">₹412 Cr</div><div class="delta up">▲ 8.2% vs Q1 · Target ₹430 Cr</div></div>
+        <div class="kpi good-card"><div class="label">Contribution Margin</div><div class="value">18.4%</div><div class="delta up">▲ 1.1 pt vs Q1 · Target 20%</div></div>
+        <div class="kpi bad-card"><div class="label">Repeat Purchase Rate</div><div class="value">41%</div><div class="delta down">▼ 0.6 pt vs Q1 · Target 45%</div></div>
+        <div class="kpi good-card"><div class="label">Branded Search Index</div><div class="value">128</div><div class="delta up">▲ 12 pts vs Q1 · Market Lead</div></div>
+        <div class="kpi warn-card"><div class="label">CAC (Blended)</div><div class="value">₹342</div><div class="delta down">▲ 4% vs Q1 · Target <₹320</div></div>
+      </div>
+      <div class="card-row">
+        <div class="card">
+          <h3>GMV & Contribution Margin by SBU</h3>
+          <div class="table-wrap"><table>
+            <tr><th>SBU</th><th>GMV (₹ Cr)</th><th>Mix</th><th>Contribution Margin</th><th>QoQ Growth</th><th>Return Index</th></tr>
+            <tr><td>Marketplace</td><td>221</td><td>54%</td><td>16.1%</td><td class="delta up">+6.4%</td><td class="mono">5.8x</td></tr>
+            <tr><td>Owned Brands</td><td>134</td><td>33%</td><td>27.3%</td><td class="delta up">+11.2%</td><td class="mono">4.6x</td></tr>
+            <tr><td>Offline Retail</td><td>57</td><td>14%</td><td>9.8%</td><td class="delta down">+2.1%</td><td class="mono">2.6x</td></tr>
+            <tr style="font-weight:600;border-top:1.5px solid var(--line);"><td>Total</td><td>412</td><td>100%</td><td>18.4%</td><td class="delta up">+8.2%</td><td class="mono">4.4x</td></tr>
+          </table></div>
+          <div class="note">Owned Brands carry the highest margin per rupee invested — leadership's next-rupee decision leans toward owned-brand expansion over marketplace subsidy, pending category-level view.</div>
+        </div>
+        <div class="card">
+          <h3>Quarterly Revenue Trend (₹ Cr)</h3>
+          <div class="bar-chart">
+            <div class="bar-col"><div class="bar-fill wine-bar" style="height:64px;"></div><div class="bar-label">Q3 FY25</div><span style="font-size:10px;font-weight:600;">348</span></div>
+            <div class="bar-col"><div class="bar-fill wine-bar" style="height:70px;"></div><div class="bar-label">Q4 FY25</div><span style="font-size:10px;font-weight:600;">362</span></div>
+            <div class="bar-col"><div class="bar-fill wine-bar" style="height:76px;"></div><div class="bar-label">Q1 FY26</div><span style="font-size:10px;font-weight:600;">381</span></div>
+            <div class="bar-col"><div class="bar-fill good-bar" style="height:84px;"></div><div class="bar-label">Q2 FY26</div><span style="font-size:10px;font-weight:600;">412</span></div>
+            <div class="bar-col"><div class="bar-fill" style="height:96px;background:#E0D5D0;"></div><div class="bar-label">Q3 Target</div><span style="font-size:10px;font-weight:600;color:var(--ink-soft);">460</span></div>
+          </div>
+          <div class="good-note" style="margin-top:12px;">Trajectory: +8.2% QoQ. Diwali quarter (Q3) historically delivers 12-15% lift — ₹460 Cr target achievable if Fragrance and Offline Retail recover to plan.</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Investment Allocation vs Return Yield</h3>
+        <div class="table-wrap"><table>
+          <tr><th>Investment Category</th><th>Q2 Spend (₹ Cr)</th><th>% of Total</th><th>Attributed Return (₹ Cr)</th><th>Yield</th><th>vs Target Yield</th><th>Signal</th></tr>
+          <tr><td><span class="mono-sm">INV-1</span> Performance Marketing</td><td>48.2</td><td>34%</td><td>280</td><td class="mono">5.8x</td><td class="pill good">Above</td><td>Scale</td></tr>
+          <tr><td><span class="mono-sm">INV-2</span> Brand & Content</td><td>31.0</td><td>22%</td><td>161</td><td class="mono">5.2x</td><td class="pill good">Above</td><td>Maintain</td></tr>
+          <tr><td><span class="mono-sm">INV-3</span> Offline Retail</td><td>21.7</td><td>15%</td><td>57</td><td class="mono">2.6x</td><td class="pill bad">Below</td><td class="flag">Review</td></tr>
+          <tr><td><span class="mono-sm">INV-4</span> Team Costs</td><td>18.4</td><td>13%</td><td>—</td><td class="mono">N/A</td><td>—</td><td>Fixed</td></tr>
+          <tr><td><span class="mono-sm">INV-5</span> Platform / Tech</td><td>14.2</td><td>10%</td><td>—</td><td class="mono">Lag</td><td>—</td><td>Invest</td></tr>
+          <tr><td><span class="mono-sm">INV-6</span> Seller Incentives</td><td>8.0</td><td>6%</td><td>46</td><td class="mono">5.8x</td><td class="pill good">Above</td><td>Scale</td></tr>
+          <tr style="font-weight:600;border-top:1.5px solid var(--line);"><td>Total</td><td>141.5</td><td>100%</td><td>544</td><td class="mono">3.8x</td><td></td><td></td></tr>
+        </table></div>
+        <div class="note"><strong>Leadership Decision:</strong> Offline Retail (INV-3) consumes 15% of investment but yields only 2.6x — below the 3.5x threshold. Recommend freezing new store capex until existing stores hit 3.0x. Redirect ₹5-8 Cr toward Performance Marketing (INV-1) where marginal yield is highest.</div>
+      </div>
+    </div>
+
+    <!-- MARKETING DASHBOARD -->
+    <div class="screen" id="marketing">
+      <div class="screen-head">
+        <div class="tag">Dashboard · Who: CMO, Marketing Manager</div>
+        <h2>02 · Marketing Dashboard</h2>
+        <p><strong>Why this page exists:</strong> Marketing teams need to optimize campaigns in real-time, allocate budgets efficiently, and prove ROI on every channel. <strong>Decision supported:</strong> Where to increase/decrease spend by channel and campaign.</p>
+        <div class="meta-row"><span>CMO: Priya Sharma</span><span>Period: Q2 FY26</span><span>Total Budget: ₹48.2 Cr</span></div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi good-card"><div class="label">Blended ROAS</div><div class="value">5.8x</div><div class="delta up">▲ 0.3x vs Q1</div></div>
+        <div class="kpi warn-card"><div class="label">CAC</div><div class="value">₹342</div><div class="delta down">▲ 4% vs Target</div></div>
+        <div class="kpi good-card"><div class="label">CTR (Avg)</div><div class="value">2.4%</div><div class="delta up">▲ 0.2 pt</div></div>
+        <div class="kpi good-card"><div class="label">Conversion Rate</div><div class="value">4.8%</div><div class="delta up">▲ 0.4 pt</div></div>
+        <div class="kpi warn-card"><div class="label">App Installs</div><div class="value">1.2L</div><div class="delta down">▼ 8% vs Target</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Campaign Performance Ranking</h3>
+          <div class="table-wrap"><table>
+            <tr><th>Campaign</th><th>Spend (₹ L)</th><th>Revenue (₹ L)</th><th>ROAS</th><th>CAC</th><th>Conv %</th><th>Action</th></tr>
+            <tr><td>Summer Skincare Sale</td><td>184</td><td>1,280</td><td class="mono">6.9x</td><td>₹298</td><td>5.2%</td><td class="pill good">Scale</td></tr>
+            <tr><td>Nykaa Hot Pink Sale</td><td>320</td><td>1,950</td><td class="mono">6.1x</td><td>₹310</td><td>5.8%</td><td class="pill good">Scale</td></tr>
+            <tr><td>Bridal Beauty Collection</td><td>142</td><td>710</td><td class="mono">5.0x</td><td>₹380</td><td>4.1%</td><td class="pill good">Maintain</td></tr>
+            <tr><td>Fragrance Discovery</td><td>201</td><td>342</td><td class="mono">1.7x</td><td>₹620</td><td>1.8%</td><td class="pill bad">Pause</td></tr>
+            <tr><td>New Launch: Kay Beauty</td><td>88</td><td>520</td><td class="mono">5.9x</td><td>₹290</td><td>6.1%</td><td class="pill good">Scale</td></tr>
+          </table></div>
+        </div>
+        <div class="card">
+          <h3>Channel Performance</h3>
+          <div class="table-wrap"><table>
+            <tr><th>Channel</th><th>Spend (₹ Cr)</th><th>% of Budget</th><th>ROAS</th><th>Target ROAS</th><th>Variance</th></tr>
+            <tr><td>Paid Search</td><td>16.4</td><td>34%</td><td class="mono">6.8x</td><td>5.5x</td><td class="pill good">+1.3x</td></tr>
+            <tr><td>Paid Social</td><td>14.5</td><td>30%</td><td class="mono">4.2x</td><td>5.0x</td><td class="pill warn">-0.8x</td></tr>
+            <tr><td>Display / Retargeting</td><td>8.2</td><td>17%</td><td class="mono">5.1x</td><td>4.5x</td><td class="pill good">+0.6x</td></tr>
+            <tr><td>App Install</td><td>5.3</td><td>11%</td><td class="mono">3.5x</td><td>4.0x</td><td class="pill warn">-0.5x</td></tr>
+            <tr><td>Influencer</td><td>3.8</td><td>8%</td><td class="mono">7.2x</td><td>6.0x</td><td class="pill good">+1.2x</td></tr>
+          </table></div>
+          <div class="note"><strong>Budget Recommendation:</strong> Shift ₹4 Cr from Paid Social (underperforming) to Paid Search (+₹2 Cr) and Kay Beauty launch support (+₹2 Cr). Pause Fragrance Discovery campaign immediately — saves ₹2 Cr/month.</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Budget Allocation — Current vs Recommended</h3>
+        <div class="two-col">
+          <div>
+            <h4>Current Allocation (₹48.2 Cr)</h4>
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar-fill wine-bar" style="height:68px;"></div><div class="bar-label">Search</div><span style="font-size:10px;">34%</span></div>
+              <div class="bar-col"><div class="bar-fill wine-bar" style="height:60px;"></div><div class="bar-label">Social</div><span style="font-size:10px;">30%</span></div>
+              <div class="bar-col"><div class="bar-fill wine-bar" style="height:34px;"></div><div class="bar-label">Display</div><span style="font-size:10px;">17%</span></div>
+              <div class="bar-col"><div class="bar-fill wine-bar" style="height:22px;"></div><div class="bar-label">App</div><span style="font-size:10px;">11%</span></div>
+              <div class="bar-col"><div class="bar-fill wine-bar" style="height:16px;"></div><div class="bar-label">Influ.</div><span style="font-size:10px;">8%</span></div>
+            </div>
+          </div>
+          <div>
+            <h4>Recommended Allocation (₹46 Cr — saves ₹2.2 Cr)</h4>
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar-fill good-bar" style="height:78px;"></div><div class="bar-label">Search</div><span style="font-size:10px;">39%</span></div>
+              <div class="bar-col"><div class="bar-fill good-bar" style="height:46px;"></div><div class="bar-label">Social</div><span style="font-size:10px;">23%</span></div>
+              <div class="bar-col"><div class="bar-fill good-bar" style="height:34px;"></div><div class="bar-label">Display</div><span style="font-size:10px;">17%</span></div>
+              <div class="bar-col"><div class="bar-fill good-bar" style="height:20px;"></div><div class="bar-label">App</div><span style="font-size:10px;">10%</span></div>
+              <div class="bar-col"><div class="bar-fill good-bar" style="height:22px;"></div><div class="bar-label">Influ.</div><span style="font-size:10px;">11%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORY DASHBOARD -->
+    <div class="screen" id="category">
+      <div class="screen-head">
+        <div class="tag">Dashboard · Who: Category Manager</div>
+        <h2>03 · Category Dashboard</h2>
+        <p><strong>Why this page exists:</strong> Category managers need to track revenue, profitability, inventory, and growth trends per category to make assortment and pricing decisions.</p>
+        <div class="meta-row"><span>Owner: Category Team</span><span>Period: Q2 FY26</span></div>
+      </div>
+      <div class="filter-bar">
+        <span class="filter-label">Filter:</span>
+        <select><option>All Categories</option><option>Skincare</option><option>Makeup</option><option>Fragrance</option><option>Haircare</option><option>Personal Care</option><option>Wellness</option></select>
+        <select><option>Q2 FY26</option><option>Q1 FY26</option><option>Q4 FY25</option></select>
+      </div>
+      <div class="card">
+        <h3>Category Performance Summary</h3>
+        <div class="table-wrap"><table>
+          <tr><th>Category</th><th>Revenue (₹ Cr)</th><th>Margin %</th><th>QoQ Growth</th><th>Inventory Turns</th><th>Sell-through</th><th>SKU Count</th><th>vs Target</th><th>Action</th></tr>
+          <tr><td>Skincare</td><td>148</td><td>32%</td><td class="delta up">+14%</td><td>4.2x</td><td>78%</td><td>1,840</td><td class="pill good">Above</td><td>Invest</td></tr>
+          <tr><td>Makeup</td><td>126</td><td>28%</td><td class="delta up">+8%</td><td>3.8x</td><td>72%</td><td>2,100</td><td class="pill good">On Target</td><td>Maintain</td></tr>
+          <tr><td>Haircare</td><td>68</td><td>26%</td><td class="delta up">+11%</td><td>3.5x</td><td>70%</td><td>1,210</td><td class="pill good">Above</td><td>Expand</td></tr>
+          <tr class="flag-cell"><td>Fragrance</td><td>42</td><td>35%</td><td class="delta down">-3%</td><td>2.1x</td><td>54%</td><td>890</td><td class="pill bad">Below</td><td class="flag">⚠ Review</td></tr>
+          <tr><td>Personal Care</td><td>28</td><td>22%</td><td class="delta up">+5%</td><td>3.1x</td><td>68%</td><td>640</td><td class="pill warn">Slight</td><td>Optimize</td></tr>
+        </table></div>
+        <div class="alert"><strong>Action Required — Fragrance:</strong> Despite 35% margin (highest among all categories), Fragrance is the only category showing negative QoQ growth (-3%) and poor inventory turns (2.1x). Recommend: (1) Reduce slow-moving SKUs by 20%, (2) Launch 5 exclusive fragrance partnerships, (3) Run clearance on inventory aged >180 days.</div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Revenue Trend by Category (Last 6 Quarters)</h3>
+          <div class="table-wrap"><table>
+            <tr><th>Quarter</th><th>Skincare</th><th>Makeup</th><th>Haircare</th><th>Fragrance</th></tr>
+            <tr><td>Q1 FY25</td><td>98</td><td>88</td><td>42</td><td>34</td></tr>
+            <tr><td>Q2 FY25</td><td>108</td><td>96</td><td>48</td><td>38</td></tr>
+            <tr><td>Q3 FY25</td><td>125</td><td>110</td><td>55</td><td>44</td></tr>
+            <tr><td>Q4 FY25</td><td>132</td><td>118</td><td>60</td><td>46</td></tr>
+            <tr><td>Q1 FY26</td><td>130</td><td>117</td><td>61</td><td>43</td></tr>
+            <tr style="font-weight:600;"><td>Q2 FY26</td><td>148</td><td>126</td><td>68</td><td>42</td></tr>
+          </table></div>
+          <div class="note">Fragrance peaked at ₹46 Cr in Q4 FY25 and has been declining for 2 consecutive quarters — structural issue, not seasonal.</div>
+        </div>
+        <div class="card">
+          <h3>Inventory Health</h3>
+          <div class="table-wrap"><table>
+            <tr><th>Category</th><th>Fresh (<90 days)</th><th>Aging (90-180)</th><th>Dead (>180)</th><th>Action</th></tr>
+            <tr><td>Skincare</td><td class="pill good">82%</td><td>14%</td><td class="flag">4%</td><td>OK</td></tr>
+            <tr><td>Makeup</td><td class="pill good">75%</td><td>18%</td><td class="flag">7%</td><td>Moderate</td></tr>
+            <tr><td>Haircare</td><td class="pill good">78%</td><td>16%</td><td class="flag">6%</td><td>OK</td></tr>
+            <tr class="flag-cell"><td>Fragrance</td><td class="pill warn">54%</td><td class="pill warn">24%</td><td class="pill bad">22%</td><td class="flag">⚠ Urgent</td></tr>
+            <tr><td>Personal Care</td><td class="pill good">71%</td><td>20%</td><td class="flag">9%</td><td>Watch</td></tr>
+          </table></div>
+          <div class="alert"><strong>Fragrance: 22% dead inventory</strong> — equivalent to ₹9.2 Cr locked in unsold stock. Immediate clearance sale recommended to recover at least 40-50% of cost.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STORE DASHBOARD -->
+    <div class="screen" id="store">
+      <div class="screen-head">
+        <div class="tag">Dashboard · Who: Store Manager, Retail Head</div>
+        <h2>04 · Store Dashboard</h2>
+        <p><strong>Why this page exists:</strong> Store managers need to monitor footfall, conversion, ROPO, and regional performance to optimize operations and local marketing. <strong>Decision supported:</strong> Staff allocation, local promotions, store improvements.</p>
+        <div class="meta-row"><span>Stores: 180+ across India</span><span>Period: Q2 FY26</span></div>
+      </div>
+      <div class="filter-bar">
+        <span class="filter-label">City:</span>
+        <select><option>All Cities</option><option>Mumbai</option><option>Delhi NCR</option><option>Bengaluru</option><option>Pune</option><option>Hyderabad</option><option>Chennai</option></select>
+        <select><option>All Store Types</option><option>Flagship</option><option>Mall</option><option>High Street</option></select>
+      </div>
+      <div class="card">
+        <h3>Store Performance — Mumbai Region</h3>
+        <div class="table-wrap"><table>
+          <tr><th>Store ID</th><th>Location</th><th>Footfall</th><th>Conversion %</th><th>Avg Bill (₹)</th><th>ROPO Rate</th><th>Revenue (₹ L)</th><th>vs Target</th></tr>
+          <tr><td>NYK-BOM-014</td><td>Bandra</td><td>18,240</td><td>22%</td><td>1,890</td><td>11%</td><td>758</td><td class="pill good">▲ Above</td></tr>
+          <tr><td>NYK-BOM-032</td><td>Lower Parel</td><td>21,450</td><td>24%</td><td>2,140</td><td>13%</td><td>1,102</td><td class="pill good">▲ Above</td></tr>
+          <tr><td>NYK-BOM-045</td><td>Juhu</td><td>14,870</td><td>20%</td><td>1,620</td><td>9%</td><td>482</td><td class="pill good">On Target</td></tr>
+          <tr><td>NYK-BOM-056</td><td>Andheri</td><td>11,320</td><td>17%</td><td>1,450</td><td>7%</td><td>279</td><td class="pill warn">▼ Slight</td></tr>
+          <tr class="flag-cell"><td>NYK-BOM-021</td><td>Powai</td><td>9,110</td><td>14%</td><td>1,210</td><td>6%</td><td>154</td><td class="pill bad">▼ Below</td></tr>
+        </table></div>
+        <div class="alert">NYK-BOM-021 (Powai) is the worst performer — trailing 8 pts below city average on conversion + ROPO. See Diagnostic Dashboard for root cause analysis.</div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Regional Heat Map — Revenue Performance</h3>
+          <div class="table-wrap"><table>
+            <tr><th>City</th><th>Stores</th><th>Avg Revenue/Store (₹ L)</th><th>Footfall Avg</th><th>ROPO Avg</th><th>Status</th></tr>
+            <tr><td>Mumbai</td><td>35</td><td>412</td><td>12,400</td><td>8.4%</td><td class="pill good">Leading</td></tr>
+            <tr><td>Delhi NCR</td><td>42</td><td>398</td><td>13,100</td><td>7.8%</td><td class="pill good">Leading</td></tr>
+            <tr><td>Bengaluru</td><td>28</td><td>354</td><td>10,800</td><td>8.1%</td><td class="pill good">Strong</td></tr>
+            <tr><td>Pune</td><td>14</td><td>298</td><td>8,400</td><td>6.2%</td><td class="pill warn">Average</td></tr>
+            <tr><td>Hyderabad</td><td>16</td><td>312</td><td>9,100</td><td>6.8%</td><td class="pill warn">Average</td></tr>
+            <tr><td>Chennai</td><td>12</td><td>276</td><td>7,600</td><td>5.5%</td><td class="pill bad">Below</td></tr>
+          </table></div>
+        </div>
+        <div class="card">
+          <h3>Store Operational Metrics</h3>
+          <div class="table-wrap"><table>
+            <tr><th>Metric</th><th>Best Store</th><th>Avg Store</th><th>Worst Store</th><th>Spread</th></tr>
+            <tr><td>Staff Utilization</td><td>87%</td><td>72%</td><td class="bad">48%</td><td class="flag">39 pts</td></tr>
+            <tr><td>Stock-out Rate</td><td>2.1%</td><td>6.8%</td><td class="bad">18.4%</td><td class="flag">16.3 pts</td></tr>
+            <tr><td>Customer Wait Time</td><td>2.4 min</td><td>5.1 min</td><td class="bad">14.2 min</td><td class="flag">11.8 min</td></tr>
+            <tr><td>NPS Score</td><td>78</td><td>62</td><td class="bad">34</td><td class="flag">44 pts</td></tr>
+          </table></div>
+          <div class="note"><strong>Recommendation:</strong> The 39-pt spread in staff utilization and 16-pt spread in stock-outs suggest inconsistent store management. Implement standardized operating procedures and cross-store manager rotation program.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIAGNOSTIC DASHBOARD -->
+    <div class="screen" id="diagnostic">
+      <div class="screen-head">
+        <div class="tag">Dashboard · Who: Business Analyst, Any Manager</div>
+        <h2>05 · Diagnostic Dashboard — Root Cause Analysis</h2>
+        <p><strong>Why this page exists:</strong> When a KPI turns red, someone needs to drill down to find WHY. This screen provides multi-level drill-down from Region → City → Store → Campaign → Week. <strong>Decision supported:</strong> Where exactly to intervene.</p>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" data-dtab="diag-store">Store NYK-BOM-021 (Powai)</button>
+        <button class="tab-btn" data-dtab="diag-fragrance">Fragrance Category</button>
+        <button class="tab-btn" data-dtab="diag-chennai">Chennai Region</button>
+      </div>
+      <div class="tab-content active" id="diag-store">
+        <div class="two-col-uneven">
+          <div class="card">
+            <h3>Drill-down: Region → City → Store → Campaign → Week</h3>
+            <div class="table-wrap"><table>
+              <tr><th>Week</th><th>Footfall</th><th>Conversion %</th><th>Local Mktg Spend (₹K)</th><th>Staff Hrs</th><th>Inventory %</th></tr>
+              <tr><td>W1</td><td>2,410</td><td>21%</td><td>84</td><td>320</td><td>94%</td></tr>
+              <tr><td>W2</td><td>2,380</td><td>20%</td><td>80</td><td>318</td><td>92%</td></tr>
+              <tr><td>W3</td><td>2,190</td><td>18%</td><td>52</td><td>315</td><td>88%</td></tr>
+              <tr class="flag-cell"><td>W4</td><td>2,050</td><td>15%</td><td>30</td><td>312</td><td>84%</td></tr>
+              <tr class="flag-cell"><td>W5</td><td>1,940</td><td>14%</td><td>28</td><td>310</td><td>81%</td></tr>
+              <tr class="flag-cell"><td>W6</td><td>1,890</td><td>13%</td><td>26</td><td>308</td><td>78%</td></tr>
+              <tr class="flag-cell"><td>W7</td><td>1,920</td><td>14%</td><td>29</td><td>310</td><td>76%</td></tr>
+              <tr class="flag-cell"><td>W8</td><td>1,880</td><td>14%</td><td>27</td><td>308</td><td>75%</td></tr>
+            </table></div>
+          </div>
+          <div class="card">
+            <h3>Root Cause Analysis</h3>
+            <div style="line-height:1.8;font-size:13px;">
+              <p><strong>🔍 Finding 1 — Marketing Cut:</strong> Local marketing spend (<span class="mono">INV-3.4</span>) was cut by <strong>68%</strong> between W2 (₹84K) and W4 (₹30K). Conversion dropped from 21% → 14% in the same window.</p>
+              <p style="margin-top:10px;"><strong>🔍 Finding 2 — Inventory Depletion:</strong> Stock levels dropped from 94% to 75% over 8 weeks. Top 50 SKUs had <strong>14% stock-out rate</strong> in W6-W8.</p>
+              <p style="margin-top:10px;"><strong>🔍 Finding 3 — Budget Reallocation:</strong> The ₹54K/week marketing cut was redirected to high-performing Bandra (NYK-BOM-014) and Lower Parel stores — inadvertently starving Powai.</p>
+            </div>
+            <div class="note"><strong>Recommended Action:</strong> 1) Restore local marketing to ₹75-85K/week for 4 weeks. 2) Replenish top 50 SKUs to 95%+ stock levels. 3) If conversion doesn't recover to 20%+ within 4 weeks, consider store relocation. The ₹30K/week "saving" was destroying ₹8-10L/week in store revenue.</div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-content" id="diag-fragrance">
+        <div class="two-col-uneven">
+          <div class="card">
+            <h3>Fragrance — Channel-level Investment Breakdown</h3>
+            <div class="table-wrap"><table>
+              <tr><th>Channel</th><th>Spend (₹ L)</th><th>Return (₹ L)</th><th>Return Index</th><th>% of Category Spend</th></tr>
+              <tr class="flag-cell"><td>Paid Social (INV-1.2)</td><td>142</td><td>198</td><td class="mono">1.4x</td><td>47%</td></tr>
+              <tr><td>Paid Search (INV-1.1)</td><td>68</td><td>154</td><td class="mono">2.3x</td><td>23%</td></tr>
+              <tr><td>Influencer (INV-2.1)</td><td>54</td><td>110</td><td class="mono">2.0x</td><td>18%</td></tr>
+              <tr><td>Retargeting (INV-1.4)</td><td>37</td><td>50</td><td class="mono">1.4x</td><td>12%</td></tr>
+            </table></div>
+            <div class="alert"><strong>Finding:</strong> Paid Social consumes 47% of Fragrance investment (₹142L) but returns only 1.4x. Same channel delivers 6.2x for Skincare — suggesting either creative fatigue or structural issue with Fragrance as social-commerce category.</div>
+          </div>
+          <div class="card">
+            <h3>Competitor Context</h3>
+            <div class="table-wrap"><table>
+              <tr><th>Competitor</th><th>Fragrance Market Share</th><th>Price Position</th><th>Nykaa Trend</th></tr>
+              <tr><td>Tira (Reliance)</td><td>~22%</td><td>15-20% cheaper</td><td class="pill bad">Losing share</td></tr>
+              <tr><td>Amazon</td><td>~30%</td><td>10-25% cheaper</td><td class="pill bad">Losing share</td></tr>
+              <tr><td>Sephora India</td><td>~18%</td><td>Premium</td><td class="pill warn">Stable</td></tr>
+              <tr><td>Myntra</td><td>~15%</td><td>Comparable</td><td class="pill warn">Slight loss</td></tr>
+            </table></div>
+            <div class="note"><strong>Recommended:</strong> 1) Shift 40% of Fragrance Paid Social budget to Paid Search + Retargeting. 2) Negotiate exclusive launch windows with 3-5 fragrance brands. 3) Test influencer-led discovery content before re-scaling social spend. 4) Run price-match guarantee on top 20 fragrance SKUs.</div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-content" id="diag-chennai">
+        <div class="card">
+          <h3>Chennai Region — Root Cause</h3>
+          <p style="line-height:1.8;">Chennai's 12 stores average ₹276L revenue vs ₹412L in Mumbai — a <strong>33% gap</strong>. Drill-down reveals:</p>
+          <div class="table-wrap"><table>
+            <tr><th>Factor</th><th>Mumbai Avg</th><th>Chennai Avg</th><th>Gap</th></tr>
+            <tr><td>Local Marketing Spend/Store</td><td>₹72K/week</td><td>₹31K/week</td><td class="flag">-57%</td></tr>
+            <tr><td>Store Size (sq ft)</td><td>2,400</td><td>1,200</td><td>-50%</td></tr>
+            <tr><td>Premium Brand Presence</td><td>82%</td><td>48%</td><td class="flag">-34 pts</td></tr>
+            <tr><td>Events per Month</td><td>3.2</td><td>1.1</td><td class="flag">-66%</td></tr>
+          </table></div>
+          <div class="note"><strong>Recommendation:</strong> Chennai stores are under-invested across the board. Pilot: Upgrade 2 Chennai stores to flagship size, increase local marketing 2x, and host monthly beauty events. Target: Close the gap to 15% from 33% in 2 quarters.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENARIO PLANNER -->
+    <div class="screen" id="scenario">
+      <div class="screen-head">
+        <div class="tag">Tool · Who: Leadership, Finance Head</div>
+        <h2>06 · Scenario Planner — Next-Rupee Allocation</h2>
+        <p><strong>Why this page exists:</strong> Before making budget decisions, leadership needs to model "what-if" scenarios. This tool simulates the financial impact of reallocating investments. <strong>Decision supported:</strong> Which budget scenario maximizes GMV and margin.</p>
+      </div>
+      <div class="three-col">
+        <div class="card"><h3>Scenario A: Status Quo</h3><p style="font-size:12px;color:var(--ink-soft);margin-bottom:8px;">No reallocation. Continue current mix.</p>
+          <table><tr><td>Projected GMV</td><td class="mono">₹430 Cr</td></tr><tr><td>Contribution Margin</td><td class="mono">18.4%</td></tr><tr><td>Blended Return Index</td><td class="mono">3.8x</td></tr><tr><td>Risk</td><td class="pill warn">Medium</td></tr></table></div>
+        <div class="card" style="border:1.5px solid var(--good);"><h3>Scenario B: Shift to Performance <span class="pill good">Recommended</span></h3><p style="font-size:12px;color:var(--ink-soft);margin-bottom:8px;">₹8 Cr from Offline Retail → Performance Marketing + ₹2 Cr to Platform Tech.</p>
+          <table><tr><td>Projected GMV</td><td class="mono">₹452 Cr</td></tr><tr><td>Contribution Margin</td><td class="mono">19.6%</td></tr><tr><td>Blended Return Index</td><td class="mono">4.3x</td></tr><tr><td>Risk</td><td class="pill good">Low-Medium</td></tr></table>
+          <div class="good-note" style="font-size:11px;margin-top:8px;">+₹22 Cr GMV and +1.2 pts margin vs base case.</div></div>
+        <div class="card"><h3>Scenario C: Aggressive Offline</h3><p style="font-size:12px;color:var(--ink-soft);margin-bottom:8px;">Add ₹10 Cr for 8 new stores.</p>
+          <table><tr><td>Projected GMV</td><td class="mono">₹438 Cr</td></tr><tr><td>Contribution Margin</td><td class="mono">17.1%</td></tr><tr><td>Blended Return Index</td><td class="mono">3.2x</td></tr><tr><td>Risk</td><td class="pill bad">High</td></tr></table>
+          <div class="alert" style="font-size:11px;margin-top:8px;">Margin dilution. New stores take 12-18 months for 3.0x efficiency.</div></div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <h3>P&L Impact — Next 2 Quarters</h3>
+        <div class="table-wrap"><table>
+          <tr><th>Metric</th><th>Base (A)</th><th>Recommended (B)</th><th>Offline Heavy (C)</th></tr>
+          <tr><td>Total Investment</td><td class="mono">₹290 Cr</td><td class="mono">₹290 Cr</td><td class="mono">₹300 Cr</td></tr>
+          <tr><td>Projected Revenue</td><td class="mono">₹860 Cr</td><td class="mono">₹904 Cr</td><td class="mono">₹876 Cr</td></tr>
+          <tr><td>Contribution Margin</td><td class="mono">₹158 Cr (18.4%)</td><td class="mono">₹177 Cr (19.6%)</td><td class="mono">₹150 Cr (17.1%)</td></tr>
+          <tr><td>Incremental GMV vs Base</td><td class="mono">—</td><td class="mono" style="color:var(--good);">+₹44 Cr</td><td class="mono">+₹16 Cr</td></tr>
+        </table></div>
+        <div class="note"><strong>Recommendation:</strong> Adopt Scenario B for Q3 FY26. Freeze new store openings. Redirect ₹8 Cr to Performance Marketing and ₹2 Cr to Platform Tech. Review Offline Retail investment only after NYK-BOM-021 and Fragrance issues are resolved. Schedule review in 6 weeks.</div>
+      </div>
+      <div class="card">
+        <h3>Interactive What-If Simulator</h3>
+        <div class="form-grid">
+          <div class="field"><label>Shift from (Source)</label><select><option>INV-3 Offline Retail</option><option>INV-2 Brand & Content</option><option>INV-4 Team Costs</option></select></div>
+          <div class="field"><label>Shift to (Destination)</label><select><option>INV-1 Performance Marketing</option><option>INV-5 Platform Tech</option><option>INV-6 Seller Incentives</option></select></div>
+          <div class="field"><label>Amount (₹ Cr)</label><input type="number" value="8" placeholder="Enter amount"></div>
+        </div>
+        <div class="btn-row"><button class="btn">Run Simulation</button><button class="btn ghost">Compare with Scenario B</button></div>
+        <div class="info-note" style="margin-top:12px;"><strong>How it works:</strong> The simulator uses historical yield data from the Investment Fact table. Each Investment Category has a known return curve — marginal yield diminishes at higher spend levels. The model picks the point on each curve that maximizes blended return.</div>
+      </div>
+    </div>
+
+    <!-- BUSINESS & DECISIONS -->
+    <div class="screen" id="business">
+      <div class="screen-head">
+        <div class="tag">Design · Steps 1-3</div>
+        <h2>07 · Business Selection, Decisions & Decision Makers</h2>
+        <p><strong>Why this page exists:</strong> Before designing any system, we must define the business context, the decisions to support, and who makes those decisions.</p>
+      </div>
+      <div class="card">
+        <h3>Nykaa — Business Model</h3>
+        <p style="line-height:1.7;">Nykaa (FSN E-Commerce Ventures Ltd) is India's leading beauty and personal care omnichannel retailer. <strong>Business Units:</strong></p>
+        <div class="three-col" style="margin-top:10px;">
+          <div style="background:#F8F5F2;padding:14px;border-radius:8px;"><strong>Marketplace (54% GMV)</strong><br><span style="font-size:12px;color:var(--ink-soft);">3,000+ brands, 2.5L+ SKUs listed. Commission-based model. Lowest margin but highest reach.</span></div>
+          <div style="background:#F8F5F2;padding:14px;border-radius:8px;"><strong>Owned Brands (33% GMV)</strong><br><span style="font-size:12px;color:var(--ink-soft);">Nykaa Cosmetics, Kay Beauty, Wanderlust, Nykaa Naturals. Highest margin (27.3%).</span></div>
+          <div style="background:#F8F5F2;padding:14px;border-radius:8px;"><strong>Offline Retail (14% GMV)</strong><br><span style="font-size:12px;color:var(--ink-soft);">180+ stores across 70+ cities. Experience-driven. Lower digital efficiency.</span></div>
+        </div>
+        <p style="margin-top:12px;line-height:1.7;"><strong>Target Customers:</strong> Urban women 18-45, premium beauty enthusiasts, Tier 1-2 expansion. <strong>Why this system is needed:</strong> Nykaa spends ₹500+ Cr annually on marketing and operations across 3 SBUs — without a unified decision system, money leaks across silos.</p>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Key Business Decisions</h3>
+          <div style="line-height:2;font-size:13px;">
+            <p>🎯 <strong>Budget Allocation:</strong> How to split ₹500 Cr across SBUs, channels, categories?</p>
+            <p>📊 <strong>Campaign Optimization:</strong> Which campaigns to scale, pause, or kill?</p>
+            <p>🏪 <strong>Store Performance:</strong> Which stores need intervention vs expansion?</p>
+            <p>💰 <strong>Category Investment:</strong> Which categories deserve more inventory & marketing?</p>
+            <p>📈 <strong>Growth Strategy:</strong> Where will the next ₹100 Cr of GMV come from?</p>
+            <p>⚖️ <strong>ROI Trade-offs:</strong> Short-term revenue vs long-term brand building?</p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Decision Matrix</h3>
+          <div class="table-wrap"><table>
+            <tr><th>User</th><th>Key Question</th><th>Dashboard</th><th>Decision Made</th></tr>
+            <tr><td>CEO</td><td>Are we winning?</td><td>Leadership</td><td>Capital allocation, M&A, strategy</td></tr>
+            <tr><td>CFO</td><td>Where's the ROI?</td><td>Leadership + Scenario</td><td>Budget approval, investment reallocation</td></tr>
+            <tr><td>CMO</td><td>Which campaigns work?</td><td>Marketing</td><td>Campaign budget, channel mix</td></tr>
+            <tr><td>Category Mgr</td><td>Which categories grow?</td><td>Category</td><td>Inventory, pricing, promotions</td></tr>
+            <tr><td>Store Manager</td><td>How's my store doing?</td><td>Store</td><td>Staffing, local marketing, ops</td></tr>
+            <tr><td>Business Analyst</td><td>Why did this break?</td><td>Diagnostic</td><td>Root cause investigation</td></tr>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAXONOMY -->
+    <div class="screen" id="taxonomy">
+      <div class="screen-head">
+        <div class="tag">Design · Steps 4-5</div>
+        <h2>08 · Investment & Return Taxonomy</h2>
+        <p><strong>Why this page exists:</strong> Every rupee spent and every outcome earned maps to exactly one leaf in these trees. IDs are canonical — names can evolve without breaking historical queries.</p>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>📤 Investment Tree (Where Money Goes)</h3>
+          <div class="tree">
+            <div class="l1"><span class="mono">INV-1</span> Performance Marketing</div>
+            <div class="l2"><span class="mono">INV-1.1</span> Paid Search · <span class="mono">INV-1.2</span> Paid Social · <span class="mono">INV-1.3</span> App Install · <span class="mono">INV-1.4</span> Retargeting · <span class="mono">INV-1.5</span> Shopping Ads</div>
+            <div class="l1" style="margin-top:6px;"><span class="mono">INV-2</span> Brand & Content Marketing</div>
+            <div class="l2"><span class="mono">INV-2.1</span> Influencer · <span class="mono">INV-2.2</span> TV/OOH · <span class="mono">INV-2.3</span> Content Production · <span class="mono">INV-2.4</span> PR & Events · <span class="mono">INV-2.5</span> Brand Collaborations</div>
+            <div class="l1" style="margin-top:6px;"><span class="mono">INV-3</span> Offline Retail Spend</div>
+            <div class="l2"><span class="mono">INV-3.1</span> Store Rent · <span class="mono">INV-3.2</span> Store Staff · <span class="mono">INV-3.3</span> Visual Merchandising · <span class="mono">INV-3.4</span> Local Store Marketing · <span class="mono">INV-3.5</span> Store Capex</div>
+            <div class="l1" style="margin-top:6px;"><span class="mono">INV-4</span> Team Costs</div>
+            <div class="l2"><span class="mono">INV-4.1</span> Marketing Team · <span class="mono">INV-4.2</span> Category Team · <span class="mono">INV-4.3</span> Store Ops · <span class="mono">INV-4.4</span> Tech Team</div>
+            <div class="l1" style="margin-top:6px;"><span class="mono">INV-5</span> Platform & Technology</div>
+            <div class="l2"><span class="mono">INV-5.1</span> App/Web Dev · <span class="mono">INV-5.2</span> Analytics · <span class="mono">INV-5.3</span> AI/ML · <span class="mono">INV-5.4</span> CRM Systems</div>
+            <div class="l1" style="margin-top:6px;"><span class="mono">INV-6</span> Marketplace Seller Incentives</div>
+            <div class="l2"><span class="mono">INV-6.1</span> Commission Discounts · <span class="mono">INV-6.2</span> Co-op Ad Credits · <span class="mono">INV-6.3</span> Fulfillment Subsidies</div>
+            <div class="l1" style="margin-top:6px;"><span class="mono">INV-7</span> Others / Unallocated</div>
+            <div class="l2"><span class="mono">INV-7.1</span> Miscellaneous · <span class="mono">INV-7.2</span> Contingency</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>📥 Return Tree (What Comes Back)</h3>
+          <div class="tree">
+            <div class="l1"><span class="mono">RET-1</span> Direct Revenue <span class="pill fast">Fast</span></div>
+            <div class="l2"><span class="mono">RET-1.1</span> App Sales · <span class="mono">RET-1.2</span> Web Sales · <span class="mono">RET-1.3</span> Store Sales · <span class="mono">RET-1.4</span> Marketplace GMV</div>
+            <div class="l1" style="margin-top:6px;"><span class="mono">RET-2</span> Customer Retention <span class="pill slow">Slow</span></div>
+            <div class="l2"><span class="mono">RET-2.1</span> Repeat Purchase Revenue · <span class="mono">RET-2.2</span> Membership Renewal · <span class="mono">RET-2.3</span> CLV Increase</div>
+            <div class="l1" style="margin-top:6px;"><span class="mono">RET-3</span> Brand Pull <span class="pill slow">Slow</span></div>
+            <div class="l2"><span class="mono">RET-3.1</span> Organic Traffic · <span class="mono">RET-3.2</span> Branded Search Volume · <span class="mono">RET-3.3</span> Organic App Installs · <span class="mono">RET-3.4</span> Brand Mentions</div>
+            <div class="l1" style="margin-top:6px;"><span class="mono">RET-4</span> Store-driven Return <span class="pill mix">Mixed</span></div>
+            <div class="l2"><span class="mono">RET-4.1</span> Footfall-to-Sale · <span class="mono">RET-4.2</span> ROPO (Online→Offline) · <span class="mono">RET-4.3</span> Store NPS</div>
+            <div class="l1" style="margin-top:6px;"><span class="mono">RET-5</span> Owned Brand Impact <span class="pill fast">Fast</span></div>
+            <div class="l2"><span class="mono">RET-5.1</span> Owned Brand Revenue · <span class="mono">RET-5.2</span> Owned Brand Margin · <span class="mono">RET-5.3</span> Brand Trial Rate</div>
+            <div class="l1" style="margin-top:6px;"><span class="mono">RET-6</span> Customer Satisfaction <span class="pill slow">Slow</span></div>
+            <div class="l2"><span class="mono">RET-6.1</span> NPS · <span class="mono">RET-6.2</span> CSAT · <span class="mono">RET-6.3</span> Reviews & Ratings</div>
+            <div class="l1" style="margin-top:6px;"><span class="mono">RET-7</span> Others / Unattributed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHARED DIMENSIONS -->
+    <div class="screen" id="dimensions">
+      <div class="screen-head">
+        <div class="tag">Design · Step 6</div>
+        <h2>09 · Shared Dimensions</h2>
+        <p><strong>Why this page exists:</strong> Every investment and return record must carry the same dimensions so they can be joined, compared, and sliced. Missing dimensions = broken analysis.</p>
+      </div>
+      <div class="card">
+        <h3>Mandatory Dimensions (attached to every row in both Fact tables)</h3>
+        <div class="table-wrap"><table>
+          <tr><th>#</th><th>Dimension</th><th>Field Name</th><th>Data Type</th><th>Example Values</th><th>Mandatory?</th><th>Notes</th></tr>
+          <tr><td>1</td><td>SBU</td><td class="mono-sm">sbu_id</td><td>VARCHAR(20)</td><td>MARKETPLACE, OWNED_BRANDS, OFFLINE_RETAIL</td><td>✅ Yes</td><td>Cannot be NULL</td></tr>
+          <tr><td>2</td><td>Product Category</td><td class="mono-sm">category_id</td><td>VARCHAR(20)</td><td>SKINCARE, MAKEUP, FRAGRANCE, HAIRCARE, PERSONAL_CARE, N/A</td><td>✅ Yes</td><td>Use "N/A" not NULL</td></tr>
+          <tr><td>3</td><td>Brand</td><td class="mono-sm">brand_id</td><td>VARCHAR(30)</td><td>Nykaa_Cosmetics, Kay_Beauty, LOREAL, N/A</td><td>✅ Yes</td><td>For brand-specific investments</td></tr>
+          <tr><td>4</td><td>SKU</td><td class="mono-sm">sku_id</td><td>VARCHAR(50)</td><td>Individual product ID or "N/A"</td><td>⚠ Optional</td><td>Only for SKU-level campaigns</td></tr>
+          <tr><td>5</td><td>Location</td><td class="mono-sm">location_id</td><td>VARCHAR(30)</td><td>ONLINE, NYK-BOM-014, NYK-DEL-008</td><td>✅ Yes</td><td>"ONLINE" for digital-only</td></tr>
+          <tr><td>6</td><td>Channel</td><td class="mono-sm">channel_id</td><td>VARCHAR(20)</td><td>APP, WEB, STORE, MARKETPLACE_EXT</td><td>✅ Yes</td><td>Where the transaction happens</td></tr>
+          <tr><td>7</td><td>Source / Attribution</td><td class="mono-sm">source_id</td><td>VARCHAR(20)</td><td>ORGANIC, PAID, INFLUENCER, REFERRAL, DIRECT</td><td>✅ Yes</td><td>How the customer arrived</td></tr>
+          <tr><td>8</td><td>Customer Segment</td><td class="mono-sm">segment_id</td><td>VARCHAR(20)</td><td>NEW, REPEAT, VIP, LAPSED, N/A</td><td>✅ Yes</td><td>For cohort analysis</td></tr>
+          <tr><td>9</td><td>Device</td><td class="mono-sm">device_type</td><td>VARCHAR(10)</td><td>MOBILE, DESKTOP, TABLET, IN-STORE</td><td>⚠ Optional</td><td>For UX optimization</td></tr>
+          <tr><td>10</td><td>Campaign</td><td class="mono-sm">campaign_id</td><td>VARCHAR(30)</td><td>CAMP-SUMMER-24, N/A</td><td>⚠ Optional</td><td>NULL for non-campaign spend</td></tr>
+          <tr><td>11</td><td>Date</td><td class="mono-sm">record_date</td><td>DATE</td><td>2026-07-15</td><td>✅ Yes</td><td>Can't aggregate without date</td></tr>
+          <tr><td>12</td><td>Week / Month / Qtr / Year</td><td class="mono-sm">(derived)</td><td>Derived</td><td>2026-W28, 2026-Q2</td><td>Auto</td><td>Derived from record_date</td></tr>
+          <tr><td>13</td><td>Campaign Owner</td><td class="mono-sm">owner_id</td><td>VARCHAR(20)</td><td>EMP-1423</td><td>✅ Yes</td><td>Accountability</td></tr>
+          <tr><td>14</td><td>Approval Status</td><td class="mono-sm">approval_status</td><td>VARCHAR(10)</td><td>DRAFT, PENDING, APPROVED, REJECTED</td><td>✅ Yes</td><td>Default: DRAFT</td></tr>
+          <tr><td>15</td><td>Entered By</td><td class="mono-sm">entered_by</td><td>VARCHAR(20)</td><td>EMP-1423</td><td>Auto</td><td>From login session</td></tr>
+          <tr><td>16</td><td>Timestamp</td><td class="mono-sm">created_at</td><td>TIMESTAMP</td><td>2026-07-15 08:30:00 IST</td><td>Auto</td><td>Audit trail</td></tr>
+        </table></div>
+        <div class="note"><strong>Design Rule:</strong> "N/A" over NULL. Whenever a dimension genuinely doesn't apply (e.g., "Location" for a pan-India digital campaign), use "N/A" — never NULL. NULLs break JOINs and GROUP BYs silently, causing under-counting that's hard to detect.</div>
+      </div>
+    </div>
+
+    <!-- KPI ARCHITECTURE -->
+    <div class="screen" id="kpi-arch">
+      <div class="screen-head">
+        <div class="tag">Design · Step 7</div>
+        <h2>10 · KPI Architecture — Lead vs Lag</h2>
+        <p><strong>Why this page exists:</strong> KPIs must be organized so managers know which metrics predict future performance (Lead) vs which measure past results (Lag). Every KPI needs Target, Best, and Variance.</p>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>🚀 Lead KPIs (Predictive / Actionable)</h3>
+          <div class="table-wrap"><table>
+            <tr><th>KPI</th><th>Current</th><th>Previous</th><th>Target</th><th>Best-So-Far</th><th>Variance</th><th>Action</th></tr>
+            <tr><td>CTR (Paid Search)</td><td>2.4%</td><td>2.2%</td><td>2.8%</td><td>3.1%</td><td class="pill warn">-0.4 pt</td><td>Optimize ad copy</td></tr>
+            <tr><td>Website Traffic (Organic)</td><td>4.2M</td><td>4.0M</td><td>4.5M</td><td>4.8M</td><td class="pill good">On track</td><td>Maintain SEO</td></tr>
+            <tr><td>Social Media Reach</td><td>18M</td><td>16M</td><td>20M</td><td>22M</td><td class="pill warn">-2M</td><td>Boost content</td></tr>
+            <tr><td>App Installs</td><td>1.2L</td><td>1.3L</td><td>1.5L</td><td>1.6L</td><td class="pill bad">-0.3L</td><td>Increase ASO</td></tr>
+            <tr><td>Sessions (Total)</td><td>28M</td><td>26M</td><td>30M</td><td>31M</td><td class="pill good">On track</td><td>—</td></tr>
+            <tr><td>Add to Cart Rate</td><td>12%</td><td>11.5%</td><td>14%</td><td>15.2%</td><td class="pill warn">-2 pt</td><td>Improve UX</td></tr>
+            <tr><td>Email Open Rate</td><td>18%</td><td>17%</td><td>22%</td><td>24%</td><td class="pill warn">-4 pt</td><td>A/B test subject</td></tr>
+            <tr><td>Customer Support Tickets</td><td>4,200</td><td>4,800</td><td><3,500</td><td>3,200</td><td class="pill bad">+700</td><td>Investigate</td></tr>
+          </table></div>
+        </div>
+        <div class="card">
+          <h3>📊 Lag KPIs (Outcome / Results)</h3>
+          <div class="table-wrap"><table>
+            <tr><th>KPI</th><th>Current</th><th>Previous</th><th>Target</th><th>Best-So-Far</th><th>Variance</th><th>Action</th></tr>
+            <tr><td>Revenue (₹ Cr)</td><td>412</td><td>381</td><td>430</td><td>438</td><td class="pill warn">-18</td><td>Accelerate Q3</td></tr>
+            <tr><td>Gross Profit (₹ Cr)</td><td>76</td><td>66</td><td>86</td><td>88</td><td class="pill warn">-10</td><td>Improve margins</td></tr>
+            <tr><td>Marketing ROI</td><td>3.8x</td><td>3.6x</td><td>4.2x</td><td>4.4x</td><td class="pill warn">-0.4x</td><td>Reallocate</td></tr>
+            <tr><td>Repeat Purchase %</td><td>41%</td><td>41.6%</td><td>45%</td><td>47%</td><td class="pill bad">-4 pt</td><td>Loyalty push</td></tr>
+            <tr><td>CLV (₹)</td><td>4,800</td><td>4,900</td><td>5,500</td><td>5,800</td><td class="pill warn">-700</td><td>Retention focus</td></tr>
+            <tr><td>Brand Awareness</td><td>78%</td><td>76%</td><td>82%</td><td>84%</td><td class="pill good">On track</td><td>—</td></tr>
+            <tr><td>Market Share</td><td>35%</td><td>34%</td><td>38%</td><td>39%</td><td class="pill good">Steady</td><td>—</td></tr>
+            <tr><td>Customer Satisfaction (NPS)</td><td>62</td><td>60</td><td>68</td><td>70</td><td class="pill warn">-6</td><td>Service focus</td></tr>
+          </table></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Ideal Performance Target Structure</h3>
+        <div class="table-wrap"><table>
+          <tr><th>Target Type</th><th>Definition</th><th>Example: Revenue</th></tr>
+          <tr><td><strong>Target</strong></td><td>Committed goal for the period</td><td class="mono">₹430 Cr</td></tr>
+          <tr><td><strong>Best-So-Far</strong></td><td>Best performance ever recorded for this KPI</td><td class="mono">₹438 Cr (Q4 FY25)</td></tr>
+          <tr><td><strong>Ideal</strong></td><td>Aspirational — where we want to be</td><td class="mono">₹500 Cr (within 3 quarters)</td></tr>
+          <tr><td><strong>Previous</strong></td><td>Last period's actual</td><td class="mono">₹381 Cr (Q1 FY26)</td></tr>
+          <tr><td><strong>Variance</strong></td><td>Current vs Target</td><td class="mono" style="color:var(--warn);">-₹18 Cr (4.2% below)</td></tr>
+        </table></div>
+        <div class="note"><strong>Recommended Action column is mandatory:</strong> Every KPI display must include "Recommended Action" — a system should never just show a number with no guidance on what to do about it.</div>
+      </div>
+    </div>
+
+    <!-- INVESTMENT INPUT -->
+    <div class="screen" id="entry-inv">
+      <div class="screen-head">
+        <div class="tag">Design · Step 8</div>
+        <h2>11 · Investment Input System</h2>
+        <p><strong>Why this page exists:</strong> All investment data enters the system through standardized forms. <strong>Who uses it:</strong> Finance team, Marketing Ops per SBU. <strong>Frequency:</strong> Weekly (daily for performance marketing).</p>
+      </div>
+      <div class="card">
+        <h3>New Investment Record — Manual Entry</h3>
+        <div class="form-grid">
+          <div class="field"><label>Category ID *</label><select><option>Select…</option><option>INV-1.1 Paid Search</option><option>INV-1.2 Paid Social</option><option>INV-3.4 Local Store Marketing</option><option>INV-4.1 Marketing Team</option></select></div>
+          <div class="field"><label>SBU *</label><select><option>Select…</option><option>Marketplace</option><option>Owned Brands</option><option>Offline Retail</option></select></div>
+          <div class="field"><label>Product Category *</label><select><option>Select…</option><option>Skincare</option><option>Makeup</option><option>N/A (not category-specific)</option></select></div>
+          <div class="field"><label>Location / Store ID *</label><select><option>Select…</option><option>ONLINE</option><option>NYK-BOM-014 (Bandra)</option></select></div>
+          <div class="field"><label>Channel *</label><select><option>Select…</option><option>App</option><option>Web</option><option>Store</option></select></div>
+          <div class="field"><label>Amount (₹) *</label><input type="number" placeholder="Enter amount"></div>
+          <div class="field"><label>Date *</label><input type="date"></div>
+          <div class="field"><label>Approval Status</label><select><option>Draft</option><option>Pending Approval</option></select></div>
+          <div class="field"><label>Notes</label><input type="text" placeholder="Campaign name, invoice ref…" style="max-width:100%;"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn">Save & Submit for Approval</button>
+          <button class="btn ghost">Save as Draft</button>
+          <button class="btn ghost">Bulk Upload (CSV)</button>
+          <button class="btn ghost">API Pull (Google Ads)</button>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Bulk Upload — CSV Template</h3>
+          <div class="table-wrap"><table>
+            <tr><th>Col</th><th>Field</th><th>Accepted Values</th><th>Example</th></tr>
+            <tr><td>A</td><td>Category ID</td><td class="mono-sm">INV-1.1 … INV-7.2</td><td class="mono-sm">INV-1.2</td></tr>
+            <tr><td>B</td><td>SBU</td><td>MARKETPLACE, OWNED_BRANDS, OFFLINE_RETAIL</td><td class="mono-sm">MARKETPLACE</td></tr>
+            <tr><td>C</td><td>Category</td><td>SKINCARE, MAKEUP, … N/A</td><td class="mono-sm">SKINCARE</td></tr>
+            <tr><td>D</td><td>Location</td><td>ONLINE or Store ID</td><td class="mono-sm">ONLINE</td></tr>
+            <tr><td>E</td><td>Channel</td><td>APP, WEB, STORE</td><td class="mono-sm">APP</td></tr>
+            <tr><td>F</td><td>Amount</td><td>Integer (₹)</td><td class="mono-sm">142000</td></tr>
+            <tr><td>G</td><td>Date</td><td>YYYY-MM-DD</td><td class="mono-sm">2026-07-15</td></tr>
+          </table></div>
+          <div class="btn-row"><button class="btn small">Download CSV Template</button></div>
+        </div>
+        <div class="card">
+          <h3>Approval Workflow</h3>
+          <div style="line-height:2;font-size:13px;">
+            <p><span class="status-dot green"></span> <strong>Draft</strong> → Record created but not submitted</p>
+            <p><span class="status-dot amber"></span> <strong>Pending</strong> → Submitted, awaiting Finance approval</p>
+            <p><span class="status-dot green"></span> <strong>Approved</strong> → Cleared, enters Investment Fact table</p>
+            <p><span class="status-dot red"></span> <strong>Rejected</strong> → Returned with comments, editable</p>
+          </div>
+          <div class="note" style="margin-top:12px;">Approval rule: Any single entry >₹5L requires 2-level approval (Manager + Finance Head). API-sourced data (Google Ads, Meta) is auto-approved below ₹2L.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RETURN INPUT -->
+    <div class="screen" id="entry-ret">
+      <div class="screen-head">
+        <div class="tag">Design · Step 9</div>
+        <h2>12 · Return Input System</h2>
+        <p><strong>Why this page exists:</strong> Return/performance data enters through automated feeds and manual forms. <strong>Who uses it:</strong> Analytics team, Store Managers (for offline returns).</p>
+      </div>
+      <div class="card">
+        <h3>New Return Record — Manual Entry</h3>
+        <div class="form-grid">
+          <div class="field"><label>Return Category ID *</label><select><option>Select…</option><option>RET-1.1 App Sales</option><option>RET-1.3 Store Sales</option><option>RET-2.1 Repeat Purchase</option></select></div>
+          <div class="field"><label>SBU *</label><select><option>Select…</option><option>Marketplace</option><option>Owned Brands</option><option>Offline Retail</option></select></div>
+          <div class="field"><label>Product Category *</label><select><option>Select…</option><option>Skincare</option><option>Makeup</option><option>Fragrance</option></select></div>
+          <div class="field"><label>Channel</label><select><option>App</option><option>Web</option><option>Store</option></select></div>
+          <div class="field"><label>Source / Attribution *</label><select><option>Organic</option><option>Paid</option><option>Influencer</option><option>Direct</option></select></div>
+          <div class="field"><label>Amount (₹) / Count</label><input type="number" placeholder="Revenue or count"></div>
+          <div class="field"><label>Date *</label><input type="date"></div>
+          <div class="field"><label>Attribution Method</label><select><option>Last-click</option><option>Multi-touch (linear)</option><option>Manual estimate</option></select></div>
+          <div class="field"><label>Upload Source File (optional)</label><input type="file" style="font-size:11px;"></div>
+        </div>
+        <div class="btn-row"><button class="btn">Save Record</button><button class="btn ghost">Save & Add Another</button><button class="btn ghost">Bulk Upload (CSV)</button></div>
+      </div>
+      <div class="card">
+        <h3>Automated Data Feeds — Source Systems</h3>
+        <div class="table-wrap"><table>
+          <tr><th>Source System</th><th>Feeds Into</th><th>Frequency</th><th>Integration Status</th></tr>
+          <tr><td>Shopify / App Backend</td><td class="mono-sm">RET-1.1, RET-1.2</td><td>Hourly</td><td class="pill good">✅ Live (API)</td></tr>
+          <tr><td>POS System (Stores)</td><td class="mono-sm">RET-1.3, RET-4.1</td><td>Daily EOD</td><td class="pill good">✅ Live (Batch)</td></tr>
+          <tr><td>Google Analytics 4</td><td class="mono-sm">RET-3.1, RET-3.2</td><td>Daily</td><td class="pill good">✅ Live (API)</td></tr>
+          <tr><td>CRM / Loyalty DB</td><td class="mono-sm">RET-2.1, RET-2.2, RET-2.3</td><td>Weekly</td><td class="pill good">✅ Live (Batch)</td></tr>
+          <tr><td>Meta Ads Manager</td><td class="mono-sm">RET-1.1 (attributed)</td><td>Daily</td><td class="pill good">✅ Live (API)</td></tr>
+          <tr><td>Google Ads</td><td class="mono-sm">RET-1.1 (attributed)</td><td>Daily</td><td class="pill good">✅ Live (API)</td></tr>
+          <tr><td>Manual Attribution</td><td class="mono-sm">RET-4.2 (ROPO)</td><td>Monthly</td><td class="pill warn">⚠ Manual</td></tr>
+          <tr><td>Brand Tracking Survey</td><td class="mono-sm">RET-3.3, RET-6.1</td><td>Quarterly</td><td class="pill warn">⚠ Manual</td></tr>
+        </table></div>
+        <div class="note">RET-4.2 (ROPO) and Brand Tracking are the only categories requiring manual entry. A production system should implement deterministic matching (phone/email across online browsing + in-store purchase) for ROPO. This is a v3.1 roadmap item.</div>
+      </div>
+    </div>
+
+    <!-- TABLES & ER -->
+    <div class="screen" id="tables">
+      <div class="screen-head">
+        <div class="tag">Design · Steps 10-12</div>
+        <h2>13 · Master Tables, Fact Tables & Entity Relationships</h2>
+        <p><strong>Why this page exists:</strong> The database design is the foundation. Two fact tables hold every transaction. All KPIs are calculated views — nothing is stored twice. The ER diagram shows how everything connects.</p>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Master Tables (Lookup / Reference)</h3>
+          <div class="table-wrap"><table>
+            <tr><th>Table Name</th><th>Primary Key</th><th>Purpose</th><th>Example Row</th></tr>
+            <tr><td class="mono-sm">mst_Investment_Category</td><td class="mono-sm">category_id</td><td>Investment taxonomy — every spend category</td><td>INV-1.1, Paid Search</td></tr>
+            <tr><td class="mono-sm">mst_Return_Category</td><td class="mono-sm">category_id</td><td>Return taxonomy — every outcome type</td><td>RET-1.1, App Sales</td></tr>
+            <tr><td class="mono-sm">mst_SBU</td><td class="mono-sm">sbu_id</td><td>Business units</td><td>MARKETPLACE</td></tr>
+            <tr><td class="mono-sm">mst_Category</td><td class="mono-sm">category_id</td><td>Product categories</td><td>SKINCARE</td></tr>
+            <tr><td class="mono-sm">mst_Brand</td><td class="mono-sm">brand_id</td><td>Brand names (Nykaa + marketplace)</td><td>Kay_Beauty</td></tr>
+            <tr><td class="mono-sm">mst_Location</td><td class="mono-sm">location_id</td><td>Country → City → Store hierarchy</td><td>NYK-BOM-014</td></tr>
+            <tr><td class="mono-sm">mst_Channel</td><td class="mono-sm">channel_id</td><td>Sales/communication channels</td><td>APP</td></tr>
+            <tr><td class="mono-sm">mst_Source</td><td class="mono-sm">source_id</td><td>Traffic/attribution sources</td><td>PAID</td></tr>
+            <tr><td class="mono-sm">mst_Customer_Segment</td><td class="mono-sm">segment_id</td><td>Customer cohorts</td><td>VIP</td></tr>
+            <tr><td class="mono-sm">mst_User</td><td class="mono-sm">user_id</td><td>System users & roles</td><td>EMP-1423</td></tr>
+            <tr><td class="mono-sm">mst_Target</td><td class="mono-sm">target_id</td><td>KPI targets per period</td><td>Q2-Revenue-430Cr</td></tr>
+            <tr><td class="mono-sm">mst_Campaign</td><td class="mono-sm">campaign_id</td><td>Marketing campaigns</td><td>CAMP-SUMMER-24</td></tr>
+          </table></div>
+        </div>
+        <div class="card">
+          <h3>Fact Tables (Transaction / Source of Truth)</h3>
+          <div class="table-wrap"><table>
+            <tr><th>Table Name</th><th>Primary Key</th><th>Foreign Keys</th><th>What It Holds</th></tr>
+            <tr><td class="mono-sm">fact_Investment</td><td class="mono-sm">investment_id (UUID)</td><td class="mono-sm">category_id → mst_Investment_Category<br>sbu_id → mst_SBU<br>location_id → mst_Location<br>channel_id → mst_Channel<br>campaign_id → mst_Campaign<br>owner_id → mst_User</td><td>Every rupee spent — the single source of truth for all costs</td></tr>
+            <tr><td class="mono-sm">fact_Return</td><td class="mono-sm">return_id (UUID)</td><td class="mono-sm">category_id → mst_Return_Category<br>sbu_id → mst_SBU<br>location_id → mst_Location<br>source_id → mst_Source<br>channel_id → mst_Channel<br>campaign_id → mst_Campaign</td><td>Every rupee earned / outcome measured — the single source of truth for all returns</td></tr>
+            <tr><td class="mono-sm">fact_Sales</td><td class="mono-sm">sale_id (UUID)</td><td class="mono-sm">sku_id → mst_SKU<br>customer_id → mst_Customer<br>location_id → mst_Location</td><td>Individual transactions — links to both Investment and Return for attribution</td></tr>
+            <tr><td class="mono-sm">fact_Activity_Log</td><td class="mono-sm">log_id</td><td class="mono-sm">user_id → mst_User</td><td>Every INSERT/UPDATE — full audit trail</td></tr>
+          </table></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Entity-Relationship Diagram</h3>
+        <div style="background:#FAF8F6;padding:20px;border-radius:8px;text-align:center;overflow-x:auto;">
+          <div class="flow-box">
+            <div class="er-block"><strong>mst_Investment_Category</strong><br><pk>PK: category_id</pk><br>parent_id (self-ref)</div>
+            <div style="font-size:20px;color:var(--wine);">→</div>
+            <div class="er-block"><strong>fact_Investment</strong><br><pk>PK: investment_id</pk><br><fk>FK: category_id</fk><br><fk>FK: sbu_id</fk><br><fk>FK: location_id</fk><br><fk>FK: channel_id</fk><br><fk>FK: campaign_id</fk></div>
+            <div style="font-size:20px;color:var(--gold);">⨝</div>
+            <div class="er-block" style="border-color:var(--good);"><strong>fact_Return</strong><br><pk>PK: return_id</pk><br><fk>FK: category_id</fk><br><fk>FK: sbu_id</fk><br><fk>FK: location_id</fk><br><fk>FK: source_id</fk></div>
+            <div style="font-size:20px;color:var(--wine);">→</div>
+            <div class="er-block"><strong>mst_Return_Category</strong><br><pk>PK: category_id</pk><br>parent_id (self-ref)</div>
+          </div>
+          <p style="margin-top:14px;font-size:11px;color:var(--ink-soft);">JOIN keys for Attribution: sbu_id + location_id + record_period + (optional) campaign_id</p>
+        </div>
+        <div class="note"><strong>Core Query Pattern:</strong> All dashboards use the same pattern — JOIN fact_Investment and fact_Return on sbu_id + location_id + period, then GROUP BY any dimension. KPIs are calculated views, not stored values.</div>
+      </div>
+    </div>
+
+    <!-- SYSTEM ARCHITECTURE -->
+    <div class="screen" id="sys-arch">
+      <div class="screen-head">
+        <div class="tag">Design · Step 13</div>
+        <h2>14 · System Architecture — End-to-End Flow</h2>
+        <p><strong>Why this page exists:</strong> Shows how data flows from business objectives all the way to management decisions. Every team member should be able to trace any number on any dashboard back to its source.</p>
+      </div>
+      <div class="card">
+        <h3>Data Flow: Business Objective → Management Decision</h3>
+        <div class="flow-box" style="flex-direction:column;gap:10px;padding:20px;">
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;">
+            <div class="flow-step highlight">🎯 Business<br>Objectives</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">📋 Key<br>Decisions</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">📤 Investment<br>Categories</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">📥 Return<br>Categories</div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;">
+            <div class="flow-step">📐 Shared<br>Dimensions</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step highlight">📝 Input<br>Forms & APIs</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step highlight">🗄️ Fact Tables<br>+ Master Tables</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">📊 KPI<br>Calculations</div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;">
+            <div class="flow-step highlight">📈 Dashboards<br>(6 views)</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">💡 Insights &<br>Recommendations</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step highlight">✅ Management<br>Decisions</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">🔄 Feedback<br>Loop</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Technical Architecture — Layers</h3>
+        <div class="table-wrap"><table>
+          <tr><th>Layer</th><th>Components</th><th>Technology (Proposed)</th></tr>
+          <tr><td>📥 Data Ingestion</td><td>Google Ads API, Meta Ads API, GA4 API, POS Batch Files, Shopify Webhooks, CSV Upload Portal</td><td>Apache Airflow (orchestration), Python ETL scripts</td></tr>
+          <tr><td>🗄️ Storage</td><td>fact_Investment, fact_Return, fact_Sales, 12 master tables</td><td>PostgreSQL (primary), Redis (cache for dashboards)</td></tr>
+          <tr><td>⚙️ Processing</td><td>Attribution engine, KPI calculator, anomaly detection, scenario simulator</td><td>Python (Pandas/NumPy), dbt for transformations</td></tr>
+          <tr><td>📊 Presentation</td><td>6 dashboards, diagnostic drill-downs, scenario planner, export to PDF/Excel</td><td>React + Chart.js / D3.js, or Tableau / Power BI</td></tr>
+          <tr><td>🔐 Governance</td><td>Role-based access (CEO sees all, Store Mgr sees 1 store), audit log, approval workflow</td><td>OAuth 2.0, row-level security in PostgreSQL</td></tr>
+        </table></div>
+        <div class="note"><strong>Principle:</strong> This architecture enforces a single source of truth. No dashboard can query a raw spreadsheet. Every number traces back to a row in fact_Investment or fact_Return with a full audit trail.</div>
+      </div>
+    </div>
+
+    <!-- SAMPLE DATA -->
+    <div class="screen" id="sample-data">
+      <div class="screen-head">
+        <div class="tag">Project · Step 20</div>
+        <h2>15 · Sample Data</h2>
+        <p><strong>Why this page exists:</strong> Demonstrate the system with realistic synthetic data that flows consistently from inputs → tables → dashboards. All data is illustrative — not Nykaa's actual financials.</p>
+      </div>
+      <div class="card">
+        <h3>Sample: 5 Rows from fact_Investment (Q2 FY26)</h3>
+        <div class="table-wrap"><table>
+          <tr><th>investment_id</th><th>category_id</th><th>sbu_id</th><th>location_id</th><th>channel_id</th><th>amount</th><th>record_date</th><th>campaign_id</th></tr>
+          <tr><td class="mono-sm">inv-8a3f-001</td><td class="mono-sm">INV-1.1</td><td>MARKETPLACE</td><td>ONLINE</td><td>APP</td><td>₹18,40,000</td><td>2026-07-03</td><td>CAMP-SUMMER-24</td></tr>
+          <tr><td class="mono-sm">inv-8a3f-002</td><td class="mono-sm">INV-1.2</td><td>MARKETPLACE</td><td>ONLINE</td><td>APP</td><td>₹14,20,000</td><td>2026-07-10</td><td>CAMP-BRIDAL-24</td></tr>
+          <tr><td class="mono-sm">inv-8a3f-003</td><td class="mono-sm">INV-3.4</td><td>OFFLINE_RETAIL</td><td>NYK-BOM-021</td><td>STORE</td><td>₹30,000</td><td>2026-08-03</td><td>N/A</td></tr>
+          <tr><td class="mono-sm">inv-8a3f-004</td><td class="mono-sm">INV-6.1</td><td>MARKETPLACE</td><td>ONLINE</td><td>WEB</td><td>₹4,50,000</td><td>2026-08-15</td><td>N/A</td></tr>
+          <tr><td class="mono-sm">inv-8a3f-005</td><td class="mono-sm">INV-5.1</td><td>MARKETPLACE</td><td>ONLINE</td><td>APP</td><td>₹9,80,000</td><td>2026-09-01</td><td>N/A</td></tr>
+        </table></div>
+      </div>
+      <div class="card">
+        <h3>Sample: 5 Rows from fact_Return (Q2 FY26)</h3>
+        <div class="table-wrap"><table>
+          <tr><th>return_id</th><th>category_id</th><th>sbu_id</th><th>location_id</th><th>source_id</th><th>amount</th><th>record_date</th><th>attribution</th></tr>
+          <tr><td class="mono-sm">ret-9b4e-001</td><td class="mono-sm">RET-1.1</td><td>MARKETPLACE</td><td>ONLINE</td><td>PAID</td><td>₹2,14,000</td><td>2026-07-04</td><td>Last-click</td></tr>
+          <tr><td class="mono-sm">ret-9b4e-002</td><td class="mono-sm">RET-1.3</td><td>OFFLINE_RETAIL</td><td>NYK-BOM-014</td><td>DIRECT</td><td>₹48,500</td><td>2026-07-08</td><td>POS</td></tr>
+          <tr><td class="mono-sm">ret-9b4e-003</td><td class="mono-sm">RET-2.1</td><td>OWNED_BRANDS</td><td>ONLINE</td><td>ORGANIC</td><td>₹1,82,000</td><td>2026-07-20</td><td>Multi-touch</td></tr>
+          <tr><td class="mono-sm">ret-9b4e-004</td><td class="mono-sm">RET-3.2</td><td>MARKETPLACE</td><td>ONLINE</td><td>ORGANIC</td><td>— (index: 128)</td><td>2026-08-01</td><td>GA4</td></tr>
+          <tr><td class="mono-sm">ret-9b4e-005</td><td class="mono-sm">RET-4.2</td><td>OFFLINE_RETAIL</td><td>NYK-BOM-032</td><td>PAID</td><td>₹62,000</td><td>2026-08-14</td><td>Manual est.</td></tr>
+        </table></div>
+        <div class="note">These 10 rows demonstrate the consistency principle: every investment row has SBU, Location, and Period. Every return row has matching dimensions. The JOIN works because the keys align.</div>
+      </div>
+    </div>
+
+    <!-- ASSUMPTIONS -->
+    <div class="screen" id="assumptions">
+      <div class="screen-head">
+        <div class="tag">Project · Step 21</div>
+        <h2>16 · Assumptions</h2>
+        <p><strong>Why this page exists:</strong> Every design choice that can't be verified with real data must be documented as an assumption so evaluators understand the context.</p>
+      </div>
+      <div class="card">
+        <h3>Key Assumptions Made in System Design</h3>
+        <div class="table-wrap"><table>
+          <tr><th>#</th><th>Assumption</th><th>Rationale</th><th>Impact if Wrong</th></tr>
+          <tr><td>1</td><td><strong>Synthetic Data:</strong> All financial figures are illustrative and do not represent Nykaa's actual performance.</td><td>Public financial data is available only at aggregate level; SBU and category-level splits are estimated.</td><td>Low — the system design (schema, forms, dashboards) works regardless of data values.</td></tr>
+          <tr><td>2</td><td><strong>Last-Click Attribution:</strong> Default attribution model is last-click. Multi-touch attribution is available but requires configuration.</td><td>Last-click is the industry standard baseline. Multi-touch requires significant data infrastructure.</td><td>Medium — last-click over-attributes to bottom-funnel channels (Paid Search) and under-attributes to brand-building (Influencer, Content).</td></tr>
+          <tr><td>3</td><td><strong>Data Refresh Frequency:</strong> Investment data refreshes weekly; Return data refreshes daily; Store POS data refreshes EOD.</td><td>Based on industry norms — ad platforms provide daily data; offline retail batches overnight.</td><td>Medium — real-time capabilities would require streaming architecture (Kafka/Kinesis).</td></tr>
+          <tr><td>4</td><td><strong>ROPO Calculation:</strong> Online-to-Offline attribution is estimated at 6-13% based on customer matching (phone/email). The actual methodology is simplified for this prototype.</td><td>True deterministic ROPO requires identity resolution across web + POS — a complex engineering problem.</td><td>High — ROPO in beauty retail may be 15-25% (industry benchmarks). Underestimating ROPO undervalues online marketing's contribution to store sales.</td></tr>
+          <tr><td>5</td><td><strong>Attribution Windows:</strong> 30-day click-through, 1-day view-through for display; 7-day for social.</td><td>Standard for e-commerce. Shorter windows for display/social due to lower intent.</td><td>Low — industry-standard values unlikely to cause material misattribution.</td></tr>
+          <tr><td>6</td><td><strong>Fragrance Decline:</strong> The Fragrance category's negative QoQ growth is attributed to pricing competition from Tira and Amazon. This is a hypothesis — actual root cause may include supplier issues or demand shifts.</td><td>Based on competitor analysis shown in Diagnostic Dashboard.</td><td>Medium — if the decline is actually due to supply chain or product quality issues, the recommended marketing reallocation won't fix it.</td></tr>
+          <tr><td>7</td><td><strong>Marginal Yield Curves:</strong> The Scenario Planner assumes each investment category has a known return curve with diminishing marginal returns at higher spend levels. These curves are estimated from historical data patterns.</td><td>This is standard in marketing mix modeling (MMM). Exact curves require econometric analysis of 2+ years of data.</td><td>Medium — inaccurate curves would produce sub-optimal budget recommendations.</td></tr>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- LIMITATIONS -->
+    <div class="screen" id="limitations">
+      <div class="screen-head">
+        <div class="tag">Project · Step 22</div>
+        <h2>17 · Limitations</h2>
+        <p><strong>Why this page exists:</strong> Be honest about what the current system CANNOT do. This builds credibility and defines the roadmap for future versions.</p>
+      </div>
+      <div class="card">
+        <h3>Current Limitations</h3>
+        <div class="table-wrap"><table>
+          <tr><th>#</th><th>Limitation</th><th>Impact</th><th>Future Enhancement (v3.1+)</th></tr>
+          <tr><td>1</td><td><strong>No Live APIs:</strong> The system shows synthetic data. In production, Google Ads, Meta Ads, GA4, and POS APIs would feed real-time data.</td><td>Data is illustrative — dashboard numbers won't match actual business performance.</td><td>Integrate live API connectors for all major ad platforms and analytics tools.</td></tr>
+          <tr><td>2</td><td><strong>Illustrative Data Only:</strong> Revenue, margin, and investment figures are estimates based on publicly available Nykaa financial reports.</td><td>Cannot be used for actual business decisions without replacing synthetic data with real data.</td><td>Connect to real database; implement data validation and reconciliation with ERP.</td></tr>
+          <tr><td>3</td><td><strong>Simplified Attribution:</strong> Uses last-click as default; multi-touch attribution is mentioned but not fully modeled.</td><td>Over-attributes value to bottom-funnel channels; under-reports brand-building ROAS.</td><td>Implement multi-touch attribution (linear, time-decay, data-driven) as user-selectable options.</td></tr>
+          <tr><td>4</td><td><strong>Estimated ROPO:</strong> Online-to-Offline attribution uses simplified estimates (6-13%) rather than deterministic matching.</td><td>May undervalue digital marketing's contribution to in-store purchases.</td><td>Implement deterministic ROPO via phone/email matching across web sessions and POS transactions.</td></tr>
+          <tr><td>5</td><td><strong>No Predictive Analytics:</strong> The Scenario Planner uses manual what-if sliders rather than ML-based forecast models.</td><td>Scenario modeling is approximate — doesn't account for interaction effects between channels.</td><td>Add ML-based Marketing Mix Modeling (MMM) with Bayesian inference for more accurate forecasts.</td></tr>
+          <tr><td>6</td><td><strong>Single Market (India):</strong> The system is designed for Nykaa's India operations only.</td><td>Cannot be used for international expansion analysis (if Nykaa expands globally).</td><td>Add multi-country and multi-currency support in the location hierarchy.</td></tr>
+          <tr><td>7</td><td><strong>No Real-time Alerts:</strong> KPIs update on daily/weekly refresh cycles — no real-time anomaly detection.</td><td>Fraud, sudden traffic drops, or viral spikes are detected with delay.</td><td>Implement streaming alerts with threshold-based notifications via email/Slack.</td></tr>
+          <tr><td>8</td><td><strong>Basic Role-Based Access:</strong> User roles are defined but not implemented with authentication in this prototype.</td><td>All screens are visible to all users in the demo. In production, Store Managers should see only their store.</td><td>Implement OAuth 2.0 with row-level security in the database.</td></tr>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- PROJECT SUMMARY -->
+    <div class="screen" id="summary">
+      <div class="screen-head">
+        <div class="tag">Project · Step 23</div>
+        <h2>18 · Project Summary</h2>
+        <p><strong>Why this page exists:</strong> A consolidated view of the entire project — business context, system design, benefits, impact, and future scope — for presentation and evaluation.</p>
+      </div>
+      <div class="card">
+        <h3>Executive Summary</h3>
+        <div style="line-height:1.8;font-size:13px;">
+          <p><strong>Business:</strong> Nykaa — India's #1 beauty omnichannel retailer with 3 SBUs (Marketplace, Owned Brands, Offline Retail), 180+ stores, 3,000+ brands, and ₹500+ Cr annual marketing & operations spend.</p>
+          <p style="margin-top:12px;"><strong>Problem:</strong> Marketing and operations spend was distributed across silos (digital marketing, store operations, seller incentives) with no unified system to track which rupees drove which returns. Leadership couldn't confidently answer "where should the next ₹10 Cr go?"</p>
+          <p style="margin-top:12px;"><strong>Solution:</strong> A unified Marketing & Retail Decision System with:</p>
+          <ul style="margin-left:20px;margin-top:4px;"><li>2 Fact tables (Investment & Return) as single source of truth</li><li>12 Master tables for consistent dimensions</li><li>6 Purpose-built dashboards for every decision-maker</li><li>Drill-down diagnostic from Region → Store → Campaign → Week</li><li>What-if Scenario Planner for budget allocation decisions</li><li>Standardized input forms with approval workflow</li></ul>
+          <p style="margin-top:12px;"><strong>Key Insight:</strong> Offline Retail consumes 15% of investment but yields 2.6x return — well below the 3.5x threshold. Fragrance category shows negative growth despite highest margins. Scenario B (shift ₹8 Cr from Offline to Performance Marketing) projects +₹22 Cr GMV and +1.2 pts margin.</p>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Benefits</h3>
+          <div style="line-height:2;font-size:13px;">
+            <p>✅ <strong>Single Source of Truth:</strong> Every number traces to a fact table row</p>
+            <p>✅ <strong>Faster Decisions:</strong> Drill-down diagnostic in <10 clicks</p>
+            <p>✅ <strong>Accountability:</strong> Every investment has an owner and approval trail</p>
+            <p>✅ <strong>ROI Clarity:</strong> Return Index for every category, channel, campaign</p>
+            <p>✅ <strong>Predictive Power:</strong> Scenario Planner shows impact before money moves</p>
+            <p>✅ <strong>Scalable Design:</strong> Add new categories, channels, stores without schema changes</p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Business Impact</h3>
+          <div style="line-height:1.8;font-size:13px;">
+            <p>📊 <strong>Marketing Efficiency:</strong> Identify +₹2.2 Cr in underperforming spend</p>
+            <p>💰 <strong>Margin Growth:</strong> Projected +1.2 pts from budget reallocation</p>
+            <p>🏪 <strong>Store Optimization:</strong> Flag underperformers before they bleed cash</p>
+            <p>📦 <strong>Inventory Health:</strong> 22% dead stock in Fragrance identified for clearance</p>
+            <p>🚀 <strong>Growth Trajectory:</strong> 24% CAGR supported with data-driven decisions</p>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Future Scope</h3>
+        <div style="line-height:1.8;font-size:13px;">
+          <p>🔮 <strong>v3.1:</strong> Live API integrations (Google Ads, Meta, GA4), ML-based Marketing Mix Modeling, real-time anomaly alerts</p>
+          <p>🔮 <strong>v3.2:</strong> Deterministic ROPO matching, multi-touch attribution engine, customer-level CLV tracking</p>
+          <p>🔮 <strong>v4.0:</strong> Multi-country support, AI-powered budget auto-optimization, voice-query dashboards ("Alexa, what's Nykaa's ROAS this week?")</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECOMMENDATIONS -->
+    <div class="screen" id="recommendations">
+      <div class="screen-head">
+        <div class="tag">Project · Step 24</div>
+        <h2>19 · Recommendations — Every Screen Supports Decisions</h2>
+        <p><strong>Why this page exists:</strong> Prove that every dashboard and analysis screen ends with clear business recommendations — not just charts. This is the core requirement: the system must drive decisions.</p>
+      </div>
+      <div class="card">
+        <h3>Decision-Ready Recommendations from Each Screen</h3>
+        <div class="table-wrap"><table>
+          <tr><th>Screen</th><th>Who Sees It</th><th>Key Recommendation</th><th>Urgency</th></tr>
+          <tr><td>01 · Leadership</td><td>CEO, CFO</td><td>Freeze new store capex. Redirect ₹8 Cr from Offline Retail to Performance Marketing. Owned Brands deserve priority investment for margin expansion.</td><td class="pill warn">This Quarter</td></tr>
+          <tr><td>02 · Marketing</td><td>CMO</td><td>Pause Fragrance Discovery campaign. Shift ₹4 Cr from Paid Social to Paid Search and Kay Beauty launch. Saves ₹2.2 Cr while growing ROAS.</td><td class="pill bad">Immediate</td></tr>
+          <tr><td>03 · Category</td><td>Category Mgr</td><td>Fragrance: Clear 22% dead inventory (₹9.2 Cr locked). Reduce slow SKUs 20%. Launch 5 exclusive fragrance partnerships.</td><td class="pill bad">Immediate</td></tr>
+          <tr><td>04 · Store</td><td>Store Manager</td><td>Chennai stores are under-invested — pilot 2 flagship upgrades. Standardize store ops to reduce 39-pt staff utilization spread.</td><td class="pill warn">Next Quarter</td></tr>
+          <tr><td>05 · Diagnostic</td><td>Business Analyst</td><td>NYK-BOM-021: Restore local marketing to ₹75K/week. Fragrance: Shift 40% social budget to search. Chennai: 2x local marketing + events.</td><td class="pill bad">This Week</td></tr>
+          <tr><td>06 · Scenario</td><td>CFO, Leadership</td><td>Adopt Scenario B for Q3. Projected +₹44 Cr GMV and +₹19 Cr incremental margin over 2 quarters vs Status Quo.</td><td class="pill warn">Before Q3</td></tr>
+        </table></div>
+        <div class="good-note"><strong>Design Principle in Action:</strong> Every chart and table in the system exists to answer a specific business question. If a chart doesn't lead to a recommendation, it shouldn't be on the screen. This is the difference between a reporting system (shows what happened) and a decision system (tells you what to do).</div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <strong>Nykaa Marketing & Retail Decision System v3.0</strong><br>
+      Complete system with all 26 screens covering: 6 dashboards, 8 design screens, 5 project documentation screens.<br>
+      <strong>Assumptions:</strong> Synthetic data · Last-click default attribution · Weekly refresh · Estimated ROPO.<br>
+      <strong>Limitations:</strong> No live APIs · Illustrative data · Simplified attribution · No ML forecasts · Basic role access.<br>
+      <strong>Built for:</strong> MRA Group Project · August 2026 · Ready for evaluation & presentation.
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Navigation between screens
+  document.querySelectorAll('.nav-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+      btn.classList.add('active');
+      var screenId = btn.getAttribute('data-screen');
+      var screen = document.getElementById(screenId);
+      if(screen){ screen.classList.add('active'); }
+    });
+  });
+
+  // Diagnostic tabs
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var tabsContainer = btn.parentElement;
+      var contentContainer = tabsContainer.parentElement;
+      tabsContainer.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+      contentContainer.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
+      btn.classList.add('active');
+      var tabId = btn.getAttribute('data-dtab');
+      var tabContent = document.getElementById(tabId);
+      if(tabContent){ tabContent.classList.add('active'); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
